@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.cdt.dsf.gdb.source
+Bundle-Version: 6.4.100.202108092002
+Eclipse-SourceBundle: org.eclipse.cdt.dsf.gdb;version="6.4.100.2021080
+ 92002";roots:="."
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+

@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.cdt.llvm.dsf.lldb.core.source
+Bundle-Version: 1.101.100.202107070245
+Eclipse-SourceBundle: org.eclipse.cdt.llvm.dsf.lldb.core;version="1.10
+ 1.100.202107070245";roots:="."
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+

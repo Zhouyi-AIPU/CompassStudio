@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.cdt.dsf.ui.source
+Bundle-Version: 2.6.200.202105230425
+Eclipse-SourceBundle: org.eclipse.cdt.dsf.ui;version="2.6.200.20210523
+ 0425";roots:="."
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+

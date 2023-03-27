@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.cdt.managedbuilder.gnu.ui.source
+Bundle-Version: 8.4.100.202106241829
+Eclipse-SourceBundle: org.eclipse.cdt.managedbuilder.gnu.ui;version="8
+ .4.100.202106241829";roots:="."
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+

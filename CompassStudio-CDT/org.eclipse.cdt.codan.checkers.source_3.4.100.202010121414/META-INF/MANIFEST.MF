@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.cdt.codan.checkers.source
+Bundle-Version: 3.4.100.202010121414
+Eclipse-SourceBundle: org.eclipse.cdt.codan.checkers;version="3.4.100.
+ 202010121414";roots:="."
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+

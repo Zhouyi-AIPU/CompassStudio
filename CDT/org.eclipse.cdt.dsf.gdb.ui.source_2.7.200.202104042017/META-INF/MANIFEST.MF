@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.eclipse.cdt.dsf.gdb.ui.source
-Bundle-Version: 2.7.200.202104042017
-Eclipse-SourceBundle: org.eclipse.cdt.dsf.gdb.ui;version="2.7.200.2021
- 04042017";roots:="."
-Bundle-Localization: plugin
-Bundle-Name: %pluginName
-

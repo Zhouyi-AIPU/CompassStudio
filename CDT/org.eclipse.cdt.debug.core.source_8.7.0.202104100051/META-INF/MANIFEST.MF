@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.eclipse.cdt.debug.core.source
-Bundle-Version: 8.7.0.202104100051
-Eclipse-SourceBundle: org.eclipse.cdt.debug.core;version="8.7.0.202104
- 100051";roots:="."
-Bundle-Localization: plugin
-Bundle-Name: %pluginName
-

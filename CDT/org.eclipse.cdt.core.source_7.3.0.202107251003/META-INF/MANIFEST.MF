@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.eclipse.cdt.core.source
-Bundle-Version: 7.3.0.202107251003
-Eclipse-SourceBundle: org.eclipse.cdt.core;version="7.3.0.202107251003
- ";roots:="."
-Bundle-Localization: plugin
-Bundle-Name: %pluginName
-

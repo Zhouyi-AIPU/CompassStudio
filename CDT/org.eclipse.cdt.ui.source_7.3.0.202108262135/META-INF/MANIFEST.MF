@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.eclipse.cdt.ui.source
-Bundle-Version: 7.3.0.202108262135
-Eclipse-SourceBundle: org.eclipse.cdt.ui;version="7.3.0.202108262135";
- roots:="."
-Bundle-Localization: plugin
-Bundle-Name: %pluginName
-

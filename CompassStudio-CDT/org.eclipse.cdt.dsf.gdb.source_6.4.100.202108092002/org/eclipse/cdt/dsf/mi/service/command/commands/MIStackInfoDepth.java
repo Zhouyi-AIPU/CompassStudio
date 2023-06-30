@@ -31,7 +31,20 @@ public class MIStackInfoDepth extends MICommand<MIStackInfoDepthInfo> {
 	}
 
 	public MIStackInfoDepth(IMIExecutionDMContext ctx, int maxDepth) {
-		super(ctx, "-stack-info-depth", new String[] { Integer.toString(maxDepth) }); //$NON-NLS-1$
+		super(ctx, "-stack-info-depth", new String[] { Integer.toString(maxDepth) });
+	}
+	 // CUSTOMIZATION FOR Multi-Core Debug
+	public MIStackInfoDepth(IMIExecutionDMContext ctx,  String tecid)
+	{
+		super(ctx, "-stack-info-depth");
+		setOptions(new String[] { "--tec", tecid }); 
+	}
+	 // CUSTOMIZATION FOR Multi-Core Debug
+	public MIStackInfoDepth(IMIExecutionDMContext ctx,  String tecid, int maxDepth)
+	{
+		super(ctx, "-stack-info-depth");
+		setOptions(new String[] { "--tec", tecid }); 
+		setParameters(new String[] { Integer.toString(maxDepth) });
 	}
 
 	@Override

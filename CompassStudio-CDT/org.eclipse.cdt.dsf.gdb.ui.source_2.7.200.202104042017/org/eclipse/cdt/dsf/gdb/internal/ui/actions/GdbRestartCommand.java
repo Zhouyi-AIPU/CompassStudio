@@ -81,6 +81,7 @@ public class GdbRestartCommand implements IRestartHandler {
 
 	@Override
 	public boolean execute(final IDebugCommandRequest request) {
+		// TODO:multi-core can`t run restart
 		if (request.getElements().length != 1) {
 			request.done();
 			return false;

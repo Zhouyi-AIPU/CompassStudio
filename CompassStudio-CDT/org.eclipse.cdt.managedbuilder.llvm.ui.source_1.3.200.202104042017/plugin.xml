@@ -90,7 +90,7 @@
             </listOptionValue>
             <listOptionValue
                   builtIn="false"
-                  value="${NPU_LIB_SEARCH_PATH}/z1_lite">
+                  value="${NPU_LIB_SEARCH_PATH}/z2">
             </listOptionValue>
          </option>
          <!-- # aipuld not support
@@ -1210,24 +1210,6 @@
                name="%Option.targetPlatform.target"
                valueHandler="org.eclipse.cdt.managedbuilder.llvm.ui.NPUCompilerTargetPlatformTypeOptionValueHandler"
                valueType="enumerated">
-            <enumeratedOptionValue
-                  command="-mcpu=Z1_0701"
-                  id="aipu.c_cpp.compiler.option.target.z1_0701"
-                  isDefault="true"
-                  name="%Option.targetPlatform.target.Z1_0701">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="-mcpu=Z1_0701_P"
-                  id="aipu.c_cpp.compiler.option.target.z1_0701_p"
-                  isDefault="false"
-                  name="%Option.targetPlatform.target.Z1_0701_P">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="-mcpu=Z1_0904"
-                  id="aipu.c_cpp.compiler.option.target.z1_0904"
-                  isDefault="false"
-                  name="%Option.targetPlatform.target.Z1_0904">
-            </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="-mcpu=Z2_0901"
                   id="aipu.c_cpp.compiler.option.target.z2_0901"

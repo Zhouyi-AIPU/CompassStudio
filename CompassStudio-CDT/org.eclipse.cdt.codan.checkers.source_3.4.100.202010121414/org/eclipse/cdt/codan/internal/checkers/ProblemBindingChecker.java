@@ -15,6 +15,9 @@
  *******************************************************************************/
 package org.eclipse.cdt.codan.internal.checkers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +50,7 @@ import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTTemplateId;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPFunction;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
-import org.eclipse.cdt.core.parser.util.CharArrayUtils;
+import org.eclipse.cdt.core.parser.IProblem;
 import org.eclipse.cdt.internal.core.dom.parser.ASTQueries;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPSemantics;
 
@@ -67,6 +70,16 @@ public class ProblemBindingChecker extends AbstractIndexAstChecker {
 	public static String ERR_ID_FieldResolutionProblem = "org.eclipse.cdt.codan.internal.checkers.FieldResolutionProblem"; //$NON-NLS-1$
 	public static String ERR_ID_VariableResolutionProblem = "org.eclipse.cdt.codan.internal.checkers.VariableResolutionProblem"; //$NON-NLS-1$
 	public static String ERR_ID_Candidates = "org.eclipse.cdt.codan.internal.checkers.Candidates"; //$NON-NLS-1$
+
+	protected List<String> as_typeList = new ArrayList<String>(// CUSTOMIZATION FOR OPENCL
+			Arrays.asList("char2", "char3", "char4", "char8", "char16", "char32", "uchar", "uchar2", "uchar3",
+					"uchar4", "uchar8", "uchar16", "uchar32", "short2", "short3", "short4", "short8",
+					"short16", "ushort", "ushort2", "ushort3", "ushort4",
+					"ushort8", "ushort16", "int2", "int3", "int4", "int8", "int16", "uint", "uint2", "uint3",
+					"uint4", "uint8", "uint16", "long2", "long3", "long4", "long8", "long16", "ulong", "ulong2",
+					"ulong3", "ulong4", "ulong8", "ulong16", "float2", "float3", "float4", "float8", "float16",
+					"half2", "half3", "half4", "half8", "half16", "double2", "double3", "double4", "double8",
+					"double16", "bool32"));
 
 	@Override
 	public boolean runInEditor() {
@@ -157,6 +170,9 @@ public class ProblemBindingChecker extends AbstractIndexAstChecker {
 								return PROCESS_CONTINUE;
 							}
 							if (id == IProblemBinding.SEMANTIC_INVALID_TYPE) {
+								if (as_typeList.contains(problemBinding.getName())) {
+									return PROCESS_CONTINUE;
+								}
 								reportProblem(ERR_ID_TypeResolutionProblem, name, name.getRawSignature(),
 										contextFlagsString);
 								return PROCESS_CONTINUE;
@@ -170,47 +186,51 @@ public class ProblemBindingChecker extends AbstractIndexAstChecker {
 //								return PROCESS_CONTINUE; // Ignore an unknown built-in.
 //							}
 							// CUSTOMIZATION
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "__")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "local")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "private")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "constant")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "lsram")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "global")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							// CUSTOMIZATION
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "lsram0")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							// CUSTOMIZATION
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "lsram1")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							// CUSTOMIZATION
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "gsram0")) { //$NON-NLS-1$
-								return PROCESS_CONTINUE; // Ignore an unknown built-in.
-							}
-							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
-									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "gsram1")) { //$NON-NLS-1$
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "__")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "local")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "private")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "constant")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "lsram")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "global")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							// CUSTOMIZATION
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "lsram0")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							// CUSTOMIZATION
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "lsram1")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							// CUSTOMIZATION
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "gsram0")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+//							if (problemBinding.getID() == IProblemBinding.SEMANTIC_NAME_NOT_FOUND
+//									&& CharArrayUtils.startsWith(problemBinding.getNameCharArray(), "gsram1")) { //$NON-NLS-1$
+//								return PROCESS_CONTINUE; // Ignore an unknown built-in.
+//							}
+
+							if (problemBinding.getID() == IProblem.SYNTAX_ERROR) { // $NON-NLS-1$
 								return PROCESS_CONTINUE; // Ignore an unknown built-in.
 							}
 

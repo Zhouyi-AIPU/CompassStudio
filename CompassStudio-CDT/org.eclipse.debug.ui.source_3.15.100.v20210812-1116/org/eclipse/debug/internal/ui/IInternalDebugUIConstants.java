@@ -38,7 +38,6 @@ public interface IInternalDebugUIConstants {
 	String IMG_LCL_SHOW_LOGICAL_STRUCTURE = "IMG_LCL_SHOW_LOGICAL_STRUCTURE"; //$NON-NLS-1$
 	String IMG_LCL_RUN_TO_LINE= "IMG_LCL_RUN_TO_LINE"; //$NON-NLS-1$
 	String IMG_SRC_LOOKUP_MENU = "IMG_SRC_LOOKUP_MENU"; //$NON-NLS-1$
-
 	/**
 	 * @deprecated Use IDebugUIConstants#IMG_LCL_ADD
 	 */

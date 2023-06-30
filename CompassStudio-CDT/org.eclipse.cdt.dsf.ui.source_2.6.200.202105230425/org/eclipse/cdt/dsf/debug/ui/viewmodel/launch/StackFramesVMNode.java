@@ -437,7 +437,7 @@ public class StackFramesVMNode extends AbstractDMVMNode
 	protected void fillFrameDataProperties(IPropertiesUpdate update, IFrameDMData data) {
 		IAddress address = data.getAddress();
 		if (address != null) {
-			update.setProperty(ILaunchVMConstants.PROP_FRAME_ADDRESS, "0x" + address.toString(16)); //$NON-NLS-1$
+			update.setProperty(ILaunchVMConstants.PROP_FRAME_ADDRESS, "0x" + address.toString(16)); 
 		}
 
 		String fileName = data.getFile();
@@ -556,7 +556,9 @@ public class StackFramesVMNode extends AbstractDMVMNode
 			return IModelDelta.CONTENT;
 		} else if (e instanceof SteppingTimedOutEvent) {
 			return IModelDelta.CONTENT;
-		} else if (e instanceof ModelProxyInstalledEvent || e instanceof DataModelInitializedEvent) {
+		} else if (e instanceof ModelProxyInstalledEvent
+		// || e instanceof DataModelInitializedEvent
+		) {
 			return IModelDelta.SELECT | IModelDelta.EXPAND;
 		} else if (e instanceof ExpandStackEvent) {
 			return IModelDelta.CONTENT;
@@ -660,7 +662,7 @@ public class StackFramesVMNode extends AbstractDMVMNode
 						public void handleCompleted() {
 							final List<Object> data = getData();
 							if (data != null && data.size() != 0) {
-								parentDelta.addNode(data.get(0), 0, IModelDelta.SELECT | IModelDelta.STATE);
+								parentDelta.addNode(data.get(0), 0, IModelDelta.SELECT | IModelDelta.STATE | IModelDelta.FORCE);
 							}
 							// Even in case of errors, complete the request monitor.
 							rm.done();
@@ -743,6 +745,7 @@ public class StackFramesVMNode extends AbstractDMVMNode
 					public void handleCompleted() {
 						if (isSuccess() && getData().size() != 0) {
 							parentDelta.addNode(getData().get(0), 0, IModelDelta.SELECT | IModelDelta.EXPAND);
+							// parentDelta.addNode(getData().get(0), 0, IModelDelta.COLLAPSE);
 						}
 						rm.done();
 					}

@@ -1347,4 +1347,6 @@ public interface IDebugUIConstants {
 	 * @since 3.8
 	 */
 	String COLUMN_ID_VARIABLE_VALUE_TYPE = COLUMN_PRESENTATION_ID_VARIABLE + ".COL_VALUE_TYPE"; //$NON-NLS-1$
+
+	String IMG_SWITCH = "IMG_SWITCH";// CUSTOMIZATION FOR Multi-Core Debug
 }

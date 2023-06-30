@@ -77,8 +77,11 @@ import org.eclipse.cdt.dsf.mi.service.command.events.MIThreadCreatedEvent;
 import org.eclipse.cdt.dsf.mi.service.command.events.MIThreadExitEvent;
 import org.eclipse.cdt.dsf.mi.service.command.events.MIWatchpointTriggerEvent;
 import org.eclipse.cdt.dsf.mi.service.command.output.CLIThreadInfo;
+import org.eclipse.cdt.dsf.mi.service.command.output.MIConst;
 import org.eclipse.cdt.dsf.mi.service.command.output.MIInfo;
+import org.eclipse.cdt.dsf.mi.service.command.output.MIResult;
 import org.eclipse.cdt.dsf.mi.service.command.output.MIThreadListIdsInfo;
+import org.eclipse.cdt.dsf.mi.service.command.output.MIValue;
 import org.eclipse.cdt.dsf.service.AbstractDsfService;
 import org.eclipse.cdt.dsf.service.DsfServiceEventHandler;
 import org.eclipse.cdt.dsf.service.DsfSession;
@@ -229,7 +232,25 @@ public class MIRunControl extends AbstractDsfService implements IMIRunControl, I
 				return StateChangeReason.WATCHPOINT;
 			} else if (getMIEvent() instanceof MIErrorEvent) {
 				return StateChangeReason.ERROR;
-			} else {
+			}
+			else {
+				// CUSTOMIZATION FOR Multi-Core Debug
+				  MIResult[] result= this.getMIEvent().getResults();
+				  for(int i=0; i< result.length; i++)
+				  {
+					  if(result[i].getVariable().equals("reason"))
+					  {
+						  MIValue val = result[i].getMIValue();
+						  if( val instanceof MIConst)
+						  {
+							  String str = ((MIConst) val).getCString();
+							  if(str.equals("switch-tec"))
+							  {
+								  return StateChangeReason.SWITCH_TEC;
+							  }
+						  }												
+					  }
+				  }			  
 				return StateChangeReason.USER_REQUEST;
 			}
 		}

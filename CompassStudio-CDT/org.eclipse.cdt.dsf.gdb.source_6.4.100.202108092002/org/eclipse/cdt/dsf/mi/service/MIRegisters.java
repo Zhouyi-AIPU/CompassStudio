@@ -585,7 +585,10 @@ public class MIRegisters extends AbstractDsfService implements IRegisters, ICach
 	 */
 	@DsfServiceEventHandler
 	public void eventDispatched(IRunControl.IResumedDMEvent e) {
-		fRegisterValueCache.setContextAvailable(e.getDMContext(), false);
+		
+		//fRegisterValueCache.setContextAvailable(e.getDMContext(), false);
+		// CUSTOMIZATION FOR Multi-Core Debug
+		fRegisterValueCache.removeAllAvailableContext();
 		if (e.getReason() != StateChangeReason.STEP) {
 			fRegisterValueCache.reset();
 		}
@@ -597,6 +600,12 @@ public class MIRegisters extends AbstractDsfService implements IRegisters, ICach
 	 */
 	@DsfServiceEventHandler
 	public void eventDispatched(IRunControl.ISuspendedDMEvent e) {
+		
+		 // CUSTOMIZATION FOR Multi-Core Debug
+		if(e.getReason() == StateChangeReason.SWITCH_TEC) //switch tec 
+	    {
+			fRegisterValueCache.removeAllAvailableContext();
+	    }
 		fRegisterValueCache.setContextAvailable(e.getDMContext(), true);
 		fRegisterValueCache.reset();
 	}

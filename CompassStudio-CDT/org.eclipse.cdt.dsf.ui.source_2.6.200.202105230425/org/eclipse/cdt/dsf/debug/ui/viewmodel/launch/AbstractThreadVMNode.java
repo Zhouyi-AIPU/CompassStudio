@@ -350,7 +350,9 @@ public abstract class AbstractThreadVMNode extends AbstractExecutionContextVMNod
 			return IModelDelta.NO_CHANGE;
 		} else if (e instanceof SteppingTimedOutEvent) {
 			return IModelDelta.CONTENT;
-		} else if (e instanceof ModelProxyInstalledEvent || e instanceof DataModelInitializedEvent) {
+		} else if (e instanceof ModelProxyInstalledEvent
+		// || e instanceof DataModelInitializedEvent
+		) {
 			return IModelDelta.SELECT | IModelDelta.EXPAND;
 		} else if (e instanceof StateChangedEvent) {
 			return IModelDelta.STATE;
@@ -384,6 +386,7 @@ public abstract class AbstractThreadVMNode extends AbstractExecutionContextVMNod
 			// Container suspended.  Do nothing here to give the stack the
 			// priority in updating. The thread will update as a result of
 			// FullStackRefreshEvent.
+			// parentDelta.setFlags(parentDelta.getFlags() | IModelDelta.CONTENT);
 			rm.done();
 		} else if (e instanceof SteppingTimedOutEvent) {
 			// Stepping time-out indicates that a step operation is taking
@@ -407,6 +410,8 @@ public abstract class AbstractThreadVMNode extends AbstractExecutionContextVMNod
 							if (isSuccess()) {
 								parentDelta.addNode(getData().fVMContext, nodeOffset + getData().fIndex,
 										IModelDelta.EXPAND | (getData().fIsSuspended ? 0 : IModelDelta.SELECT));
+								
+								// parentDelta.addNode(getData().fVMContext, nodeOffset + getData().fIndex, IModelDelta.COLLAPSE);
 							}
 							rm.done();
 						}

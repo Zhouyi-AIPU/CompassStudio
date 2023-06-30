@@ -762,12 +762,16 @@ public abstract class AbstractGNUSourceCodeParser implements ISourceCodeParser {
 		return buildProblemDeclaration(problem);
 	}
 
+	// CUSTOMIZATION
 	protected IASTProblemStatement skipProblemStatement(int offset) {
+		// marco define like _vadd(...),is a bug to syntax error for llvm.
+		// we do not showing this issue in version 2.2.0,this is a bug to be resolved.
 		failParse();
 		declarationMark = null;
 		int endOffset = skipToSemiOrClosingBrace(offset, false);
-		IASTProblem problem = createProblem(IProblem.SYNTAX_ERROR, offset, endOffset - offset);
-		return buildProblemStatement(problem);
+//		IASTProblem problem = createProblem(IProblem.SYNTAX_ERROR, offset, endOffset - offset);
+//		return buildProblemStatement(problem);
+		return null;
 	}
 
 	private IASTProblem skipProblemEnumerator(int offset) {
@@ -898,6 +902,9 @@ public abstract class AbstractGNUSourceCodeParser implements ISourceCodeParser {
 					stmtOffset = nextOffset;
 					stmt = statement();
 				}
+				if (stmt == null) {// CUSTOMIZATION
+					continue;
+				}
 				result.addStatement(stmt);
 				endOffset = calculateEndOffset(stmt);
 			} catch (BacktrackException bt) {
@@ -909,11 +916,17 @@ public abstract class AbstractGNUSourceCodeParser implements ISourceCodeParser {
 					endOffset = calculateEndOffset(beforeProblem);
 				} else {
 					IASTStatement stmt = skipProblemStatement(stmtOffset);
+					if (stmt == null) {
+						continue;
+					}
 					result.addStatement(stmt);
 					endOffset = calculateEndOffset(stmt);
 				}
 			} catch (EndOfFileException e) {
 				IASTStatement stmt = skipProblemStatement(stmtOffset);
+				if (stmt == null) {
+					continue;
+				}
 				result.addStatement(stmt);
 				endOffset = calculateEndOffset(stmt);
 				break;

@@ -387,6 +387,8 @@ public class MIRunControlEventProcessor_7_0 implements IEventProcessor {
 				containerDmc = procService.createContainerContextFromGroupId(fControlDmc, groupId);
 			}
 
+			
+
 			IExecutionDMContext execDmc = containerDmc;
 			if (threadId != null && !threadId.equals("all")) { //$NON-NLS-1$
 				IThreadDMContext threadDmc = procService.createThreadContext(procDmc, threadId);

@@ -20,6 +20,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.ViewForm;
@@ -670,6 +671,21 @@ public class SWTFactory {
 		return c;
 	}
 
+	// CUSTOMIZATION
+	public static CCombo createCCombo(Composite parent, int style, int hspan, String[] items) {
+		CCombo c = new CCombo(parent, style);
+		c.setFont(parent.getFont());
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = hspan;
+		c.setLayoutData(gd);
+		if (items != null) {
+			c.setItems(items);
+		}
+		// Some platforms open up combos in bad sizes without this, see bug 245569
+		c.setVisibleItemCount(30);
+		c.select(0);
+		return c;
+	}
 	/**
 	 * This method allows us to open the preference dialog on the specific page, in this case the perspective page
 	 * @param id the id of preference page to show

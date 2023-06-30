@@ -461,6 +461,13 @@ public class MIMemory extends AbstractDsfService implements IMemory, ICachingSer
 
 	@DsfServiceEventHandler
 	public void eventDispatched(ISuspendedDMEvent e) {
+	
+
+		 // CUSTOMIZATION FOR Multi-Core Debug
+		if(e.getReason() == StateChangeReason.SWITCH_TEC) //switch tec 
+	    {
+			fCommandCache.removeAllAvailableContext();
+	    }
 		if (e instanceof IContainerSuspendedDMEvent) {
 			fCommandCache.setContextAvailable(e.getDMContext(), true);
 		}

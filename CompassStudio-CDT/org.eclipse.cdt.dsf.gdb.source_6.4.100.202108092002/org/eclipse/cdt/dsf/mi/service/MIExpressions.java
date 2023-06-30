@@ -1662,7 +1662,10 @@ public class MIExpressions extends AbstractDsfService implements IMIExpressions,
 
 	@DsfServiceEventHandler
 	public void eventDispatched(IResumedDMEvent e) {
-		fExpressionCache.setContextAvailable(e.getDMContext(), false);
+		
+	    // CUSTOMIZATION FOR Multi-Core Debug
+		//fExpressionCache.setContextAvailable(e.getDMContext(), false);
+		fExpressionCache.removeAllAvailableContext();
 		if (e.getReason() != StateChangeReason.STEP) {
 			fExpressionCache.reset();
 		}
@@ -1670,6 +1673,12 @@ public class MIExpressions extends AbstractDsfService implements IMIExpressions,
 
 	@DsfServiceEventHandler
 	public void eventDispatched(ISuspendedDMEvent e) {
+	
+		 // CUSTOMIZATION FOR Multi-Core Debug
+		if(e.getReason() == StateChangeReason.SWITCH_TEC) //switch tec 
+	    {
+			fExpressionCache.removeAllAvailableContext();
+	    }
 		fExpressionCache.setContextAvailable(e.getDMContext(), true);
 		fExpressionCache.reset();
 

@@ -591,6 +591,13 @@ public class CommandCache implements ICommandListener {
 		}
 		return false;
 	}
+	
+	// CUSTOMIZATION FOR Multi-Core Debug
+	public void removeAllAvailableContext()
+	{
+		fAvailableContexts.clear();
+	}
+	
 
 	/**
 	 * Clears all the cache data. Equivalent to <code>reset(null)</code>.

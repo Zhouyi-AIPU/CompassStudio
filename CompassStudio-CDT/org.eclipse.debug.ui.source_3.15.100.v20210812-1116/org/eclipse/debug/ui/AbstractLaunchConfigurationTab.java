@@ -31,13 +31,16 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IPrototypeAttributesLabelProvider;
 import org.eclipse.debug.internal.ui.SWTFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
@@ -320,6 +323,26 @@ public abstract class AbstractLaunchConfigurationTab implements ILaunchConfigura
 		return SWTFactory.createCheckButton(parent, label, null, false, 1);
 	}
 
+	// CUSTOMIZATION
+	protected Label createLabel(Composite parent, String label) {
+		return SWTFactory.createLabel(parent, label, 1);
+	}
+	
+	protected CCombo createReadOnlyCCombo(Composite parent, String[] items) {
+		return SWTFactory.createCCombo(parent, SWT.READ_ONLY | SWT.BORDER, 1, items);
+	}
+
+	protected Combo createReadOnlyCombo(Composite parent, String[] items) {
+		return SWTFactory.createCombo(parent, SWT.READ_ONLY, 1, items);
+	}
+
+	protected Text createText(Composite parent, int style) {
+		return SWTFactory.createText(parent, style, 1);
+	}
+
+	protected Button createButton(Composite parent, String label) {
+		return SWTFactory.createPushButton(parent, label, null);
+	}
 	/**
 	 * @see ILaunchConfigurationTab#canSave()
 	 */

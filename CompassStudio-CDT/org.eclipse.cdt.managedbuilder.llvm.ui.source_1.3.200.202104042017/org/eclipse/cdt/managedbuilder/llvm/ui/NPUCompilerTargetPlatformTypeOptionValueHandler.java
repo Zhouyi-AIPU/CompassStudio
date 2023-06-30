@@ -102,11 +102,7 @@ public class NPUCompilerTargetPlatformTypeOptionValueHandler implements IManaged
 		String llvm_lib_path = "${" + LlvmEnvironmentVariableSupplier.ENV_VAR_NAME_LIBRARY_PATH + "}";
 		String tmp = "";
 		String target = targetType.substring(targetType.lastIndexOf(".") + 1);
-		if (target.toLowerCase().matches("z1_0701_p") || target.toLowerCase().matches("z1_0701")) {
-			tmp = llvm_lib_path + File.separator + "z1_lite";
-		} else if (target.toLowerCase().matches("z1_\\d\\d\\d\\d")) {
-			tmp = llvm_lib_path + File.separator + "z1";
-		} else if (target.toLowerCase().matches("z2_\\d\\d\\d\\d")) {
+		if (target.toLowerCase().matches("z2_\\d\\d\\d\\d")) {
 			tmp = llvm_lib_path + File.separator + "z2";
 		} else if (target.toLowerCase().matches("z3_\\d\\d\\d\\d")) {
 			tmp = llvm_lib_path + File.separator + "z3";

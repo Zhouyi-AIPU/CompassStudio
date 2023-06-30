@@ -29,7 +29,7 @@ public class MessagesForGdbLaunchVM extends NLS {
 	/** since 2.3 */
 	public static String ContainerVMNode_filtered_running_threads;
 	public static String NPUTecInfoVMNode_No_columns__text_format;
-
+	public static String NPUContainerVMNode_No_columns_text_format;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(MessagesForGdbLaunchVM.class.getName(), MessagesForGdbLaunchVM.class);

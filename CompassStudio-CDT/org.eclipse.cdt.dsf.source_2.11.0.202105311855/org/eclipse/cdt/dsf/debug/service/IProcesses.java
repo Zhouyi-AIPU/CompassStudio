@@ -183,4 +183,5 @@ public interface IProcesses extends IDsfService {
 	 * @param rm Request completion monitor, indicates success or failure.
 	 */
 	void terminate(IThreadDMContext thread, RequestMonitor requestMonitor);
+
 }

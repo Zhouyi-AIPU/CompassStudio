@@ -213,19 +213,19 @@ public abstract class AbstractContainerVMNode extends AbstractExecutionContextVM
 		}
 	}
 
-	private static class VMContextInfo {
+	public static class VMContextInfo {
 		final IVMContext fVMContext;
 		final int fIndex;
 		final boolean fIsSuspended;
 
-		VMContextInfo(IVMContext vmContext, int index, boolean isSuspended) {
+		public VMContextInfo(IVMContext vmContext, int index, boolean isSuspended) {
 			fVMContext = vmContext;
 			fIndex = index;
 			fIsSuspended = isSuspended;
 		}
 	}
 
-	private void getContainerVMCForModelProxyInstallEvent(VMDelta parentDelta,
+	protected void getContainerVMCForModelProxyInstallEvent(VMDelta parentDelta,
 			final DataRequestMonitor<VMContextInfo> rm) {
 		getVMProvider().updateNode(this, new VMChildrenUpdate(parentDelta, getVMProvider().getPresentationContext(), -1,
 				-1, new DataRequestMonitor<List<Object>>(getExecutor(), rm) {
@@ -290,7 +290,7 @@ public abstract class AbstractContainerVMNode extends AbstractExecutionContextVM
 				return IModelDelta.CONTENT;
 			}
 		} else if (e instanceof IContainerSuspendedDMEvent) {
-			return IModelDelta.NO_CHANGE;
+			return IModelDelta.CONTENT;
 		} else if (e instanceof SteppingTimedOutEvent) {
 			if (dmc instanceof IContainerDMContext) {
 				return IModelDelta.CONTENT;
@@ -303,7 +303,9 @@ public abstract class AbstractContainerVMNode extends AbstractExecutionContextVM
 			} else {
 				return IModelDelta.CONTENT;
 			}
-		} else if (e instanceof ModelProxyInstalledEvent || e instanceof DataModelInitializedEvent) {
+		} else if (e instanceof ModelProxyInstalledEvent
+		// || e instanceof DataModelInitializedEvent
+		) {
 			return IModelDelta.SELECT | IModelDelta.EXPAND;
 		} else if (e instanceof StateChangedEvent) {
 			return IModelDelta.STATE;
@@ -336,6 +338,8 @@ public abstract class AbstractContainerVMNode extends AbstractExecutionContextVM
 			// Container suspended.  Do nothing here to give the stack the
 			// priority in updating. The container and threads will update as
 			// a result of FullStackRefreshEvent.
+
+			parentDelta.setFlags(parentDelta.getFlags() | IModelDelta.CONTENT);
 		} else if (e instanceof SteppingTimedOutEvent) {
 			// Stepping time-out indicates that a step operation is taking
 			// a long time, and the view needs to be refreshed to show

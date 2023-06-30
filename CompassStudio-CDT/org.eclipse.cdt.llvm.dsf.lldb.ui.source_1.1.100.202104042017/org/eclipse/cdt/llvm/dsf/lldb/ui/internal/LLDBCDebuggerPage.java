@@ -11,11 +11,11 @@
 
 package org.eclipse.cdt.llvm.dsf.lldb.ui.internal;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.cdt.debug.ui.AbstractCDebuggerPage;
@@ -71,7 +71,6 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	// CUSTOMIZATION
 //	protected Text fLLDBCommandText;
 
-
 	public Text runirText;
 	public Text runweightText;
 	public List inputText;
@@ -110,25 +109,22 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NULL);
 		composite.setFont(parent.getFont());
-
 		composite.setLayout(new GridLayout(4, false));
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		
-		//CUSTOMIZATION
-		Label platform = new Label(composite, SWT.LEFT);
-		platform.setText("Debug Mode:");
-		comboPlatform = new CCombo(composite, SWT.READ_ONLY | SWT.BORDER);
+
+		// CUSTOMIZATION
+		createSingleTecControl(composite);
+		createLabel(composite, "Debug Mode:     ");
+		comboPlatform = createReadOnlyCCombo(composite, platform_type);
 		GridData layoutData = new GridData();
 		layoutData.horizontalAlignment = SWT.FILL;
 		layoutData.grabExcessHorizontalSpace = false;
 		layoutData.grabExcessVerticalSpace = false;
 		layoutData.verticalAlignment = SWT.CENTER;
-	    layoutData.widthHint=250;
+		layoutData.widthHint = 250;
+		layoutData.horizontalSpan = 3;
 		comboPlatform.setLayoutData(layoutData);
-		comboPlatform.setItems(platform_type);
 		comboPlatform.select(0);
-		Label hide = new Label(composite, SWT.LEFT);
-		hide.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 2, 1));
 
 		// CUSTOMIZATION remove lldb-mi debugger name in Debug Tab
 //		Label lbl = new Label(composite, SWT.LEFT);
@@ -175,9 +171,8 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 //				fLLDBCommandText.setText(res);
 //			}
 //		});
-		
 
-		//CUSTOMIZATION
+		// CUSTOMIZATION
 		cfgComposite = new Composite(composite, SWT.None);
 		cfgComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
 		stackLayout = new StackLayout();
@@ -187,29 +182,30 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		hardwareCom = createHardwareCfgComposite(cfgComposite);
 		stackLayout.topControl = simulatorCom;
 
-		comboPlatform.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (comboPlatform.getText().equals(platform_type[0])) {
-					stackLayout.topControl = simulatorCom;
-					cfgComposite.layout();
-
-
-				} else if (comboPlatform.getText().equals(platform_type[1])) {
-					stackLayout.topControl = hardwareCom;
-					cfgComposite.layout();
-
-
-				}
-			}
-
-		});
-
+		comboPlatform.addSelectionListener(widgetSelectedAdapter(e -> selectLayout()));
 		comboPlatform.addListener(SWT.Modify, new ChangeListener());
 
 		setControl(parent);
 	}
-	
+
+	public void selectLayout() {
+		if (comboPlatform.getText().equals(platform_type[0])) {
+			stackLayout.topControl = simulatorCom;
+			cfgComposite.layout();
+
+		} else if (comboPlatform.getText().equals(platform_type[1])) {
+			stackLayout.topControl = hardwareCom;
+			cfgComposite.layout();
+		}
+	}
+
+	public void createSingleTecControl(Composite composite) {
+	}
+
+	public Combo createCustomizedTargerCombo(Group group) {
+		return createReadOnlyCombo(group, GBuildConsts.simulator_targets_no_x2);
+	}
+
 	// CUSTOMIZATION
 	// aipurun configuration
 	protected Composite createSimulatorCfgCompoiste(Composite composite) {
@@ -224,41 +220,57 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		gd.marginRight = 5;
 		group.setLayout(gd);
 
-		Label targetLabel = new Label(group, SWT.NONE);
-		targetLabel.setText("Target:");
-		runTarget = new Combo(group, SWT.READ_ONLY);
+		createLabel(group, "Target:");
+		runTarget = createCustomizedTargerCombo(group);
 		runTarget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
-		runTarget.setItems(GBuildConsts.simulator_targets_no_x2);
 		runTarget.select(0);
 
-		Label irlabel = new Label(group, SWT.NONE);
-		irlabel.setText("IR Path:");
-		runirText = new Text(group, SWT.BORDER);
+		createLabel(group, "IR Path:");
+		runirText = createText(group, SWT.BORDER);
 		runirText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		Button buttonIrPath = new Button(group, SWT.NONE);
+		Button buttonIrPath = createButton(group, Messages.LLDBCDebuggerPage_browse);
 		GridData gd_buttonIrPath = new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1);
 		gd_buttonIrPath.widthHint = 100;
 		buttonIrPath.setLayoutData(gd_buttonIrPath);
-		buttonIrPath.setText(Messages.LLDBCDebuggerPage_browse);
 		buttonIrPath.addSelectionListener(new BtnSelectionListener(runirText));
 
-		Label weightlabel = new Label(group, SWT.NONE);
-		weightlabel.setText("Weight Path:");
-		runweightText = new Text(group, SWT.BORDER);
+		createLabel(group, "Weight Path:");
+		runweightText = createText(group, SWT.BORDER);
 		runweightText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
-		Button buttonWeightPath = new Button(group, SWT.NONE);
+		Button buttonWeightPath = createButton(group, Messages.LLDBCDebuggerPage_browse);
 		GridData gd_buttonWeightPath = new GridData(SWT.CENTER, SWT.FILL, false, false, 1, 1);
 		gd_buttonWeightPath.widthHint = 100;
 		buttonWeightPath.setLayoutData(gd_buttonWeightPath);
-		buttonWeightPath.setText(Messages.LLDBCDebuggerPage_browse);
 		buttonWeightPath.addSelectionListener(new BtnSelectionListener(runweightText));
 
-		Label inputsPath = new Label(group, SWT.NONE);
-		inputsPath.setText("Inputs:");
+		createSimInputControl(group);
+
+		Label otherCommandsLabel = createLabel(group, "Other Options:");
+		otherCommandsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+		runOtherCommand = createText(group, SWT.BORDER);
+		runOtherCommand.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+		new Label(group, SWT.NONE).setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 3));
+
+		// update button
+		runirText.addListener(SWT.Modify, new ChangeListener());
+		runweightText.addListener(SWT.Modify, new ChangeListener());
+		runTarget.addListener(SWT.Modify, new ChangeListener());
+		runOtherCommand.addListener(SWT.Modify, new ChangeListener());
+
+		return com;
+	}
+
+	public Combo createHardwareTargetComboControl(Group group) {
+		return createReadOnlyCombo(group, GBuildConsts.simulator_targets_no_x2);
+	}
+
+	public void createSimInputControl(Group group) {
+		Label inputs = createLabel(group, "Inputs:");
+		inputs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 3));
 		inputText = new List(group, SWT.BORDER | SWT.V_SCROLL);
-		GridData gd_buttoninputText = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 2);
+		GridData gd_buttoninputText = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 3);
 		gd_buttoninputText.heightHint = 100;
 		inputText.setLayoutData(gd_buttoninputText);
 
@@ -267,41 +279,28 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		btnLayout.marginHeight = 0;
 		btnLayout.marginWidth = 0;
 		btns.setLayout(btnLayout);
-		btns.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 2));
+		btns.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 3));
 
-		Button buttonPathDel = new Button(btns, SWT.NONE);
-		buttonPathDel.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
-		buttonPathDel.setText("Delete...");
-		((GridData) buttonPathDel.getLayoutData()).widthHint = 100;
-		buttonPathDel.addSelectionListener(new BtnListDeleteListener());
-		Button buttonInputsPath = new Button(btns, SWT.NONE);
+		Button buttonInputsPath = createButton(btns, "Add File");
 		buttonInputsPath.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
 		((GridData) buttonInputsPath.getLayoutData()).widthHint = 100;
-		buttonInputsPath.setText(Messages.LLDBCDebuggerPage_browse);
 		buttonInputsPath.addSelectionListener(new BtnListSelectionListener(inputText));
+		Button buttonPathDel = createButton(btns, "Delete File");
+		buttonPathDel.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
+		((GridData) buttonPathDel.getLayoutData()).widthHint = 100;
+		buttonPathDel.addSelectionListener(new BtnListDeleteListener());
+		Button buttonPathUp = createButton(btns, "Up...");
+		buttonPathUp.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
+		((GridData) buttonPathUp.getLayoutData()).widthHint = 100;
+		buttonPathUp.addSelectionListener(new BtnListLocationUpListener());
 
-		Label placeholder = new Label(group, SWT.NONE);
-		Label otherCommandsLabel = new Label(group, SWT.NONE);
-		otherCommandsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-		otherCommandsLabel.setText("Other Options:");
-		runOtherCommand = new Text(group, SWT.BORDER);
-		runOtherCommand.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
-		Label placeholder1 = new Label(group, SWT.NONE);
-		placeholder1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 3));
+//		new Label(group, SWT.NONE);
 
-		// update button
-		runirText.addListener(SWT.Modify, new ChangeListener());
-		runweightText.addListener(SWT.Modify, new ChangeListener());
 		inputText.addListener(SWT.Modify, new ChangeListener());
-		runTarget.addListener(SWT.Modify, new ChangeListener());
-		runOtherCommand.addListener(SWT.Modify, new ChangeListener());
-
-		return com;
 	}
 
 	// aipugb
-	protected Composite createHardwareCfgComposite(Composite composite)
-	{
+	protected Composite createHardwareCfgComposite(Composite composite) {
 		Composite com = new Composite(composite, SWT.None);
 		com.setLayout(new GridLayout(1, false));
 		Group group1 = new Group(com, SWT.None);
@@ -314,43 +313,35 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		gd.marginRight = 5;
 		group1.setLayout(gd);
 
-		Label targetLabel = new Label(group1, SWT.NONE);
-		targetLabel.setText("Target:");
-		hardwareRunTarget = new Combo(group1, SWT.READ_ONLY);
+		createLabel(group1, "Target:");
+		hardwareRunTarget = createHardwareTargetComboControl(group1);
 		hardwareRunTarget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
-		hardwareRunTarget.setItems(GBuildConsts.simulator_targets_no_x2);
 		hardwareRunTarget.select(0);
 
 		// group1: aipugb cfg
-		Label irlabel = new Label(group1, SWT.NONE);
-		irlabel.setText("IR Path:");
-		gbirText = new Text(group1, SWT.BORDER);
+		createLabel(group1, "IR Path:");
+		gbirText = createText(group1, SWT.BORDER);
 		gbirText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		Button buttonIrPath = new Button(group1, SWT.NONE);
+		Button buttonIrPath = createButton(group1, Messages.LLDBCDebuggerPage_browse);
 		GridData gd_buttonIrPath = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_buttonIrPath.widthHint = 100;
 		buttonIrPath.setLayoutData(gd_buttonIrPath);
-		buttonIrPath.setText(Messages.LLDBCDebuggerPage_browse);
 		buttonIrPath.addSelectionListener(new BtnSelectionListener(gbirText));
 
-
-		Label weightlabel = new Label(group1, SWT.NONE);
-		weightlabel.setText("Weight Path:");
-		gbweightText = new Text(group1, SWT.BORDER);
+		createLabel(group1, "Weight Path:");
+		gbweightText = createText(group1, SWT.BORDER);
 		gbweightText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		Button buttonWeightPath = new Button(group1, SWT.NONE);
+		Button buttonWeightPath = createButton(group1, Messages.LLDBCDebuggerPage_browse);
 		GridData gd_buttonWeightPath = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_buttonWeightPath.widthHint = 100;
 		buttonWeightPath.setLayoutData(gd_buttonWeightPath);
-		buttonWeightPath.setText(Messages.LLDBCDebuggerPage_browse);
 		buttonWeightPath.addSelectionListener(new BtnSelectionListener(gbweightText));
 
-		Label otherCommandsLabel = new Label(group1, SWT.None);
-		otherCommandsLabel.setText("Other Options:");
+		Label otherCommandsLabel = createLabel(group1, "Other Options:");
 		otherCommandsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-		gbOtherCommand = new Text(group1, SWT.BORDER);
+		gbOtherCommand = createText(group1, SWT.BORDER);
 		gbOtherCommand.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 3, 1));
 
 		// group2: hardware connection cfg
@@ -372,154 +363,52 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		GridLayout gd_group = new GridLayout();
 		gd_group.numColumns = 4;
 		composite.setLayout(gd_group);
-		
-		btn1 = new Button(composite, SWT.RADIO | SWT.LEFT);
-		btn1.setText("Connect with network");
+
+		btn1 = createRadioButton(composite, "Connect with network");
 		btn1.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, true, 4, 1));
 		btn1.setToolTipText(Messages.NPUDebugOnHardwareWithNetwork_tip);
 
-		Label hideLabel = new Label(composite, SWT.NONE);
-		hideLabel.setText("    ");
-		addrressLabel = new Label(composite, SWT.NONE);
-		addrressLabel.setText("Aipugdbserver Connection:");
+		createLabel(composite, "    ");
+		addrressLabel = createLabel(composite, "Aipugdbserver Connection:");
 		addrressLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-		addrrsText = new Text(composite, SWT.BORDER);
-		addrrsText.setText(Messages.NPUDebugOnHardware_Ip_port_tip);
+		addrrsText = createText(composite, SWT.BORDER);
 		addrrsText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		Label hideLabel2 = new Label(composite, SWT.NONE);
-		runcfgLabel = new Label(composite, SWT.None);
-		runcfgLabel.setText("Run Configuration File:");
-		runcfgText = new Text(composite, SWT.BORDER);
+		new Label(composite, SWT.NONE);
+		runcfgLabel = createLabel(composite, "Run Configuration File:");
+		runcfgText = createText(composite, SWT.BORDER);
 		runcfgText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		cfgBtn = new Button(composite, SWT.NONE);
-		cfgBtn.setText(Messages.LLDBCDebuggerPage_browse);
+		cfgBtn = createButton(composite, Messages.LLDBCDebuggerPage_browse);
 		cfgBtn.addSelectionListener(new BtnSelectionListener(runcfgText));
 		GridData gd_buttoncfgPath = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_buttoncfgPath.widthHint = 100;
 		cfgBtn.setLayoutData(gd_buttoncfgPath);
 
-		btn2 = new Button(composite, SWT.RADIO | SWT.LEFT);
-		btn2.setText("Connect with no-network");
+		btn2 = createRadioButton(composite, "Connect with no-network");
 		btn2.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false, 4, 1));
-
 		btn2.setToolTipText(Messages.NPUDebugOnHardwareWithNoNetwork_tip);
 
-		// Label hideLabel4 = new Label(composite, SWT.NONE);
-		// runcfgnonetLabel = new Label(composite, SWT.None);
-		// runcfgnonetLabel.setText("Run Configuration File:");
-		// runnonetcfgText = new Text(composite, SWT.BORDER);
-		// runnonetcfgText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		// cfgnonetBtn = new Button(composite, SWT.NONE);
-		// cfgnonetBtn.setText(Messages.LLDBCDebuggerPage_browse);
-		// cfgnonetBtn.addSelectionListener(new BtnSelectionListener(runnonetcfgText));
-		// GridData gd_buttonnonetcfgPath = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		// gd_buttonnonetcfgPath.widthHint = 100;
-		// cfgnonetBtn.setLayoutData(gd_buttonnonetcfgPath);
-
-		Label hideLabel3 = new Label(composite, SWT.NONE);
-		hideLabel3.setText("    ");
+		Label hideLabel3 = createLabel(composite, "    ");
 		hideLabel3.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false, 1, 3));
 		fileListCom = new List(composite, SWT.BORDER | SWT.V_SCROLL);
 		fileListCom.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4));
-		addBtn = new Button(composite, SWT.None);
-		addBtn.setText("Add File");
+		addBtn = createButton(composite, "Add File");
 		GridData addbtnGd = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		addbtnGd.widthHint = 100;
 		addBtn.setLayoutData(addbtnGd);
 
-		deleteBtn = new Button(composite, SWT.NONE);
-		deleteBtn.setText("Delete File");
+		deleteBtn = createButton(composite, "Delete File");
 		deleteBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
-		copyBtn = new Button(composite, SWT.None);
-		copyBtn.setText("Copy To");
+		copyBtn = createButton(composite, "Copy To");
 		copyBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btn1.setSelection(true);
-		setConntectionTabControlsStatus(true);
+		setConnectionTabControlsStatus(true);
 
-		addBtn.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-
-				FileDialog f = new FileDialog(new Shell(), SWT.OPEN);
-				f.setText("Select the  file ");
-				String fn = f.open();
-				if (fn != null) {
-					fileListCom.add(fn);
-				}
-				updateLaunchConfigurationDialog();
-			}
-
-		});
-
-		deleteBtn.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int[] selectfiles = fileListCom.getSelectionIndices();
-				if (selectfiles.length <= 0) {
-					MyMessageBox.showMessage("Please select a file first");
-					return;
-				}
-				fileListCom.remove(selectfiles);
-				updateLaunchConfigurationDialog();
-			}
-
-		});
-		
-		copyBtn.addSelectionListener(new SelectionAdapter()
-		{
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-
-				if (fileListCom.getItems().length < 1) {
-
-					MyMessageBox.showMessage("Please add a file first");
-					return;
-				}
-				DirectoryDialog f = new DirectoryDialog(composite.getShell(), SWT.OPEN);
-				f.setText("Select direction");
-				
-				String dir = f.open();
-				boolean transfered = true;
-				if (dir != null) {
-					for (String filePath : fileListCom.getItems()) {
-						File fileIn = new File(filePath);
-						if (FileUtils.copyFile(fileIn.getName(), fileIn.getParent(), dir)) {
-							System.out.println(fileIn.getName() + "copied succ");
-						} else {
-							MyMessageBox.alertMessage(fileIn.getName() + "copied failed");
-							transfered = false;
-							break;
-						}
-
-					}
-					if (transfered)
-						MyMessageBox.showMessage("The files have been copied successfully");
-
-				}
-			}
-
-		});
-		
-		
-
-		btn1.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (btn1.getSelection()) {
-					setConntectionTabControlsStatus(true);
-				} else {
-					setConntectionTabControlsStatus(false);
-				}
-
-			}
-
-		});
+		addBtn.addSelectionListener(widgetSelectedAdapter(e -> addFileAction()));
+		deleteBtn.addSelectionListener(widgetSelectedAdapter(e -> deleteFileAction()));
+		copyBtn.addSelectionListener(widgetSelectedAdapter(e -> copyFileAction(composite)));
+		btn1.addSelectionListener(widgetSelectedAdapter(e -> connectStatusAction()));
 
 		btn1.addListener(SWT.Selection, new ChangeListener());
 		btn2.addListener(SWT.Selection, new ChangeListener());
@@ -529,7 +418,62 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		fileListCom.addListener(SWT.Modify, new ChangeListener());
 
 	}
-	
+
+	private void connectStatusAction() {
+		if (btn1.getSelection()) {
+			setConnectionTabControlsStatus(true);
+		} else {
+			setConnectionTabControlsStatus(false);
+		}
+	}
+
+	private void copyFileAction(Composite composite) {
+		if (fileListCom.getItems().length < 1) {
+			MyMessageBox.showMessage("Please add a file first");
+			return;
+		}
+		DirectoryDialog f = new DirectoryDialog(composite.getShell(), SWT.OPEN);
+		f.setText("Select direction");
+
+		String dir = f.open();
+		boolean transfered = true;
+		if (dir != null) {
+			for (String filePath : fileListCom.getItems()) {
+				File fileIn = new File(filePath);
+				if (FileUtils.copyFile(fileIn.getName(), fileIn.getParent(), dir)) {
+					System.out.println(fileIn.getName() + "copied succ");
+				} else {
+					MyMessageBox.alertMessage(fileIn.getName() + "copied failed");
+					transfered = false;
+					break;
+				}
+
+			}
+			if (transfered)
+				MyMessageBox.showMessage("The files have been copied successfully");
+
+		}
+	}
+
+	private void deleteFileAction() {
+		int[] selectfiles = fileListCom.getSelectionIndices();
+		if (selectfiles.length <= 0) {
+			MyMessageBox.showMessage("Please select a file first");
+			return;
+		}
+		fileListCom.remove(selectfiles);
+		updateLaunchConfigurationDialog();
+	}
+
+	private void addFileAction() {
+		FileDialog f = new FileDialog(new Shell(), SWT.OPEN);
+		f.setText("Select the file ");
+		String fn = f.open();
+		if (fn != null && !Arrays.asList(fileListCom.getItems()).contains(fn)) {
+			fileListCom.add(fn);
+		}
+		updateLaunchConfigurationDialog();
+	}
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
@@ -539,7 +483,22 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		IPreferenceStore corePreferenceStore = LLDBUIPlugin.getDefault().getCorePreferenceStore();
 		configuration.setAttribute(ILLDBLaunchConfigurationConstants.ATTR_DEBUG_NAME,
 				corePreferenceStore.getString(ILLDBDebugPreferenceConstants.PREF_DEFAULT_LLDB_COMMAND));
-	}//CUSTOMIZATION
+	}// CUSTOMIZATION
+
+	public void initialCustomizationFrom(ILaunchConfiguration configuration) throws CoreException {
+		// inputs
+		java.util.List<String> inputpath = AIPULaunchPathUtils.getInputBinPath(pro);
+		String hardware_debug_cfg = AIPULaunchPathUtils.getDebugRun_cfg_FilePath(pro, 1);
+		java.util.List<String> inputfiles = new ArrayList<String>();
+		inputfiles = configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_INPUT_PATH, inputpath);
+		inputText.removeAll();
+		for (String s : inputfiles) {
+			inputText.add(s);
+		}
+
+		runcfgText.setText(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_RUN_CFG,
+				hardware_debug_cfg));
+	}
 
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
@@ -549,9 +508,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 //				preferenceStore.getString(ILLDBDebugPreferenceConstants.PREF_DEFAULT_LLDB_COMMAND));
 //		fLLDBCommandText.setText(lldbCommand);
 
-		
-
-		//CUSTOMIZATION
+		// CUSTOMIZATION
 		try {
 			// get default ir path
 			String projectName = configuration.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
@@ -564,87 +521,71 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 				File[] filelists = file.listFiles();
 				String irPath = "";
 				String weightPath = "";
-				java.util.List<String> inputpath = AIPULaunchPathUtils.getInputBinPath(pro);
-				String hardware_debug_cfg =AIPULaunchPathUtils.getDebugRun_cfg_FilePath(pro, 1); 
 				for (int i = 0; i < filelists.length; i++) {
 					File tmp = filelists[i];
 					if (tmp.getName().endsWith(".txt")) {
 						irPath = tmp.getAbsolutePath();
 					} else if (tmp.getName().endsWith(".bin")) {
-							weightPath = tmp.getAbsolutePath();
+						weightPath = tmp.getAbsolutePath();
 					}
 				}
+				initialCustomizationFrom(configuration);
 
 				comboPlatform.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE, 0));
-				runirText.setText(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_IR_PATH, irPath));
-				runweightText.setText(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_WEIGHT_PATH, weightPath));
-				// inputs
-				java.util.List<String> inputfiles = new ArrayList<String>();
-				inputfiles = configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_INPUT_PATH, inputpath);
-				inputText.removeAll();
-				for (String s : inputfiles) {
-					inputText.add(s);
-				}
+				runirText.setText(
+						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_IR_PATH, irPath));
+				runweightText.setText(configuration
+						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_WEIGHT_PATH, weightPath));
 
-				runTarget.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_TARGET, 0));
-				runOtherCommand.setText(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_OTHERCOMMAND, ""));
+				runTarget
+						.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_TARGET, 0));
+				runOtherCommand.setText(
+						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_OTHERCOMMAND, ""));
 
 				hardwareRunTarget
 						.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TARGET, 0));
 
 				// hardrware
-				gbirText.setText(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_IR_PATH, irPath));
-				gbweightText.setText(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_WEIGHT_PATH, weightPath));
-					gbOtherCommand.setText(configuration
-						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_OTHER_COMMAND, ""));
+				gbirText.setText(
+						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_IR_PATH, irPath));
+				gbweightText.setText(configuration
+						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_WEIGHT_PATH, weightPath));
+				gbOtherCommand.setText(
+						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_OTHER_COMMAND, ""));
 
-					addrrsText.setText(configuration.getAttribute(
+				addrrsText.setText(configuration.getAttribute(
 						NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_CONNECT_ADDR, connect_addr_default_value));
-					runcfgText.setText(configuration
-						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_RUN_CFG,
-									hardware_debug_cfg));
-					// runnonetcfgText.setText(configuration.getAttribute(
-					// NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_RUN_NONET_CFG, hardware_debug_cfg));
 
-					Set<String> fileSets = new HashSet<String>();
-					fileSets = configuration
-							.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES, fileSets);
-					// init fileListCom;
-					// String[] t_files = getTranslateFile(files);
-					if (fileSets != null) {
-						fileListCom.removeAll();
-						for (String s : fileSets) {
-							fileListCom.add(s);
-						}
-					}
-					int connectMode = configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_CONNECT_MODE, 0);
-					if (connectMode == 0)
-					{
-						btn1.setSelection(true);
-						btn2.setSelection(false);
-						setConntectionTabControlsStatus(true);
-					}
-					else if (connectMode == 1)
-					{
+				java.util.List<String> hardwareTranslatefiles = addTranslateFile(pro);
+				java.util.List<String> allFiles = new ArrayList<String>();
+				allFiles = configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES,
+						hardwareTranslatefiles);
+				fileListCom.removeAll();
+				for (String s : allFiles) {
+					fileListCom.add(s);
+				}
+				int connectMode = configuration
+						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_CONNECT_MODE, 0);
+				if (connectMode == 0) {
+					btn1.setSelection(true);
+					btn2.setSelection(false);
+					setConnectionTabControlsStatus(true);
+				} else if (connectMode == 1) {
 
-						btn1.setSelection(false);
-						btn2.setSelection(true);
-						setConntectionTabControlsStatus(false);
-					}
+					btn1.setSelection(false);
+					btn2.setSelection(true);
+					setConnectionTabControlsStatus(false);
+				}
 
-					if (comboPlatform.getSelectionIndex() == 0)
-					{
-						stackLayout.topControl = simulatorCom;
-						cfgComposite.layout();
-					} else {
-						stackLayout.topControl = hardwareCom;
-						cfgComposite.layout();
-					}
-					 
+				if (comboPlatform.getSelectionIndex() == 0) {
+					stackLayout.topControl = simulatorCom;
+					cfgComposite.layout();
+				} else {
+					stackLayout.topControl = hardwareCom;
+					cfgComposite.layout();
+				}
 
 			}
-
-			
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -659,23 +600,31 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		}
 	}
 
+	public void performCustomizationApply(ILaunchConfigurationWorkingCopy configuration) {
+		configuration.setAttribute(ILLDBLaunchConfigurationConstants.ATTR_DEBUG_NAME, NPUDBCoreConsts.AIPUDBGMI);
+		String[] items = inputText.getItems();
+		java.util.List<String> inputfiles = Arrays.asList(items);
+		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_INPUT_PATH, inputfiles);
+	}
+
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		// CUSTOMIZATION set debug name default to "aipudbgmi"
 		// configuration.setAttribute(ILLDBLaunchConfigurationConstants.ATTR_DEBUG_NAME,
 		// "aipuodbmi".trim());
-		configuration.setAttribute(ILLDBLaunchConfigurationConstants.ATTR_DEBUG_NAME, NPUDBCoreConsts.AIPUDBGMI);
-		//CUSTOMIZATION
-		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE, comboPlatform.getSelectionIndex());
+		// CUSTOMIZATION
+		performCustomizationApply(configuration);
+		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE,
+				comboPlatform.getSelectionIndex());
 		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_IR_PATH, runirText.getText());
-		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_WEIGHT_PATH, runweightText.getText());
+		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_WEIGHT_PATH,
+				runweightText.getText());
 
-		String[] items = inputText.getItems();
-		java.util.List<String> inputfiles = Arrays.asList(items);
-		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_INPUT_PATH, inputfiles);
-		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_TARGET, runTarget.getSelectionIndex());
-		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_OTHERCOMMAND, runOtherCommand.getText());
-		//hardware
+		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_TARGET,
+				runTarget.getSelectionIndex());
+		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_OTHERCOMMAND,
+				runOtherCommand.getText());
+		// hardware
 		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TARGET,
 				hardwareRunTarget.getSelectionIndex());
 
@@ -692,10 +641,11 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		// configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_RUN_NONET_CFG,
 		// runnonetcfgText.getText());
 		// translateFiles
-		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES,
-				saveTranslateFile(pro, fileListCom.getItems()));
-
-
+//		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES,
+//				saveTranslateFile(pro, fileListCom.getItems()));
+		String[] items = fileListCom.getItems();
+		java.util.List<String> files = Arrays.asList(items);
+		configuration.setAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES, files);
 	}
 
 	@Override
@@ -703,7 +653,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		return Messages.LLDBCDebuggerPage_tab_name;
 	}
 
-	public void setConntectionTabControlsStatus(boolean isNetwork) {
+	public void setConnectionTabControlsStatus(boolean isNetwork) {
 		if (isNetwork) {
 			fileListCom.setEnabled(false);
 			addBtn.setEnabled(false);
@@ -734,24 +684,19 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 
 	}
 
-	public Set<String> saveTranslateFile(IProject pro, String[] files)
-	{
-		Set<String> allfiles = new HashSet<String>();
+	public java.util.List<String> addTranslateFile(IProject pro) {
+		java.util.List<String> allfiles = new ArrayList<String>();
 		java.util.List<String> inputPath = AIPULaunchPathUtils.getInputBinPath(pro);
 		String aipuBinPath = AIPULaunchPathUtils.getHardwareBinPath(pro);
 		String runcfgPath = AIPULaunchPathUtils.getDebugRun_cfg_FilePath(pro, 1);
 		allfiles.addAll(inputPath);
 		if (FileUtils.exist(aipuBinPath))
 			allfiles.add(aipuBinPath);
-	    allfiles.add(runcfgPath);
+		allfiles.add(runcfgPath);
 
-		for(int i=0; i<files.length; i++)
-		{
-			allfiles.add(files[i]);
-		}
 		return allfiles;
 	}
-
+	
 	class BtnSelectionListener extends SelectionAdapter {
 		private Text text;
 
@@ -769,14 +714,29 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 			}
 		}
 	}
-	
+
+	class BtnListLocationUpListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			int selectedIndex = inputText.getSelectionIndex();
+			if (selectedIndex > 0) {
+				String selectedPath = inputText.getItem(selectedIndex);
+				String prePath = inputText.getItem(selectedIndex - 1);
+				inputText.setItem(selectedIndex - 1, selectedPath);
+				inputText.setItem(selectedIndex, prePath);
+				inputText.select(selectedIndex - 1);
+			}
+			updateLaunchConfigurationDialog();
+		}
+	}
+
 	class BtnListDeleteListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			inputText.remove(inputText.getSelectionIndices());
 			updateLaunchConfigurationDialog();
-			}
 		}
+	}
 
 	class BtnListSelectionListener extends SelectionAdapter {
 		private List text;
@@ -790,17 +750,8 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 			FileDialog f = new FileDialog(new Shell(), SWT.OPEN);
 			f.setText("Select the file");
 			String fn = f.open();
-			if (fn != null) {
-//				String originText = text.getText().trim();
-//				HashSet<String> elements;
-//				if(!originText.equals(""))
-//					elements = new HashSet<String>(Arrays.asList(originText.split(",")));
-//				else
-//					elements = new HashSet<String>();
-//				elements.add(fn);
-//				text.setText(String.join(",", elements));
-				text.add(fn);
-
+			if (fn != null && !Arrays.asList(text.getItems()).contains(fn)) {
+					text.add(fn);
 			}
 			updateLaunchConfigurationDialog();
 		}

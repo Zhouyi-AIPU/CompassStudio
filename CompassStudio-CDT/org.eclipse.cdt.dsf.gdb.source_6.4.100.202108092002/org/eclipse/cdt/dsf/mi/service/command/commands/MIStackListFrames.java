@@ -61,6 +61,20 @@ public class MIStackListFrames extends MICommand<MIStackListFramesInfo> {
 	public MIStackListFrames(IMIExecutionDMContext execDmc, int low, int high) {
 		super(execDmc, "-stack-list-frames", new String[] { Integer.toString(low), Integer.toString(high) }); //$NON-NLS-1$
 	}
+	
+	 // CUSTOMIZATION FOR Multi-Core Debug
+	public MIStackListFrames(IMIExecutionDMContext ctx,  String tecid)
+	{
+		super(ctx, "-stack-list-frames");
+		setOptions(new String[] { "--tec", tecid }); 
+	}
+	
+	 // CUSTOMIZATION FOR Multi-Core Debug
+	public MIStackListFrames(IMIExecutionDMContext execDmc, String tecid, int low, int high) {
+		super(execDmc, "-stack-list-frames", new String[] { Integer.toString(low), Integer.toString(high) }); 
+		setOptions(new String[] { "--tec", tecid }); 
+	}
+	
 
 	@Override
 	public MIStackListFramesInfo getResult(MIOutput out) {

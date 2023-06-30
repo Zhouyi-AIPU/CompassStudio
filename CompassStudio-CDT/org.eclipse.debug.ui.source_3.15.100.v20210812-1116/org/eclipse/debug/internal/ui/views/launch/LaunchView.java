@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.commands.IRestartHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -47,9 +46,7 @@ import org.eclipse.debug.internal.ui.DelegatingModelPresentation;
 import org.eclipse.debug.internal.ui.IDebugHelpContextIds;
 import org.eclipse.debug.internal.ui.actions.AddToFavoritesAction;
 import org.eclipse.debug.internal.ui.actions.EditLaunchConfigurationAction;
-import org.eclipse.debug.internal.ui.commands.actions.DisconnectCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.DropToFrameCommandAction;
-import org.eclipse.debug.internal.ui.commands.actions.RestartCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.ResumeCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.StepIntoCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.StepOverCommandAction;
@@ -170,6 +167,8 @@ public class LaunchView extends AbstractDebugView
 	private static final String TOGGLE_STEP_FILTERS = "toggle_step_filters"; //$NON-NLS-1$
 
 	private static final String RESTART = "restart"; //$NON-NLS-1$
+
+	private static final String SWITCH = "switch"; //$NON-NLS-1$
 
 	private static final int BREADCRUMB_TRIGGER_HEIGHT_DEFAULT = 30; // pixels
 
@@ -536,7 +535,7 @@ public class LaunchView extends AbstractDebugView
 		setAction(FIND_ACTION, new VirtualFindAction((TreeModelViewer) getViewer()));
 
 		addCapabilityAction(new TerminateCommandAction(), TERMINATE);
-		addCapabilityAction(new DisconnectCommandAction(), DISCONNECT);
+//		addCapabilityAction(new DisconnectCommandAction(), DISCONNECT);
 		addCapabilityAction(new SuspendCommandAction(), SUSPEND);
 		addCapabilityAction(new ResumeCommandAction(), RESUME);
 		addCapabilityAction(new StepReturnCommandAction(), STEP_RETURN);
@@ -549,7 +548,10 @@ public class LaunchView extends AbstractDebugView
 		action = new TerminateAndRelaunchAction();
 		addCapabilityAction(action, TERMINATE_AND_RELAUNCH);
 		setHandler(TERMINATE_AND_RELAUNCH, new ActionHandler(action));
-		addCapabilityAction(new RestartCommandAction(), RESTART);
+//		addCapabilityAction(new RestartCommandAction(), RESTART);
+
+		addCapabilityAction(new MultiDebugSwitchAction(), SWITCH);// CUSTOMIZATION FOR Multi-Core Debug
+
 		action = new TerminateAllAction();
 		addCapabilityAction(action, TERMINATE_ALL);
 		setHandler(TERMINATE_ALL, new ActionHandler(action));
@@ -984,7 +986,7 @@ public class LaunchView extends AbstractDebugView
 		tbm.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(RESUME));
 		tbm.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(SUSPEND));
 		tbm.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(TERMINATE));
-		tbm.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(DISCONNECT));
+//		tbm.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(DISCONNECT));
 
 		tbm.appendToGroup(IDebugUIConstants.STEP_INTO_GROUP, getAction(STEP_INTO));
 		tbm.appendToGroup(IDebugUIConstants.STEP_OVER_GROUP, getAction(STEP_OVER));
@@ -1004,7 +1006,7 @@ public class LaunchView extends AbstractDebugView
 		tbm.remove(new ActionContributionItem(getAction(RESUME)));
 		tbm.remove(new ActionContributionItem(getAction(SUSPEND)));
 		tbm.remove(new ActionContributionItem(getAction(TERMINATE)));
-		tbm.remove(new ActionContributionItem(getAction(DISCONNECT)));
+//		tbm.remove(new ActionContributionItem(getAction(DISCONNECT)));
 
 		tbm.remove(new ActionContributionItem(getAction(STEP_INTO)));
 		tbm.remove(new ActionContributionItem(getAction(STEP_OVER)));
@@ -1096,7 +1098,7 @@ public class LaunchView extends AbstractDebugView
 		properties.dispose();
 
 		disposeCommandAction(TERMINATE);
-		disposeCommandAction(DISCONNECT);
+//		disposeCommandAction(DISCONNECT);
 		disposeCommandAction(SUSPEND);
 		disposeCommandAction(RESUME);
 		disposeCommandAction(STEP_RETURN);
@@ -1105,7 +1107,8 @@ public class LaunchView extends AbstractDebugView
 		disposeCommandAction(DROP_TO_FRAME);
 		disposeCommandAction(TERMINATE_AND_REMOVE);
 		disposeCommandAction(TERMINATE_AND_RELAUNCH);
-		disposeCommandAction(RESTART);
+//		disposeCommandAction(RESTART);
+		disposeCommandAction(SWITCH);
 		disposeCommandAction(TERMINATE_ALL);
 		disposeCommandAction(TOGGLE_STEP_FILTERS);
 	}
@@ -1200,7 +1203,7 @@ public class LaunchView extends AbstractDebugView
 		menu.add(new Separator(IDebugUIConstants.EMPTY_RENDER_GROUP));
 		menu.add(new Separator(IDebugUIConstants.RENDER_GROUP));
 		menu.add(new Separator(IDebugUIConstants.PROPERTY_GROUP));
-		PropertyDialogAction action = (PropertyDialogAction)getAction("Properties"); //$NON-NLS-1$
+		PropertyDialogAction action = (PropertyDialogAction) getAction("Properties"); //$NON-NLS-1$
 		/**
 		 * TODO hack to get around bug 148424, remove if UI ever fixes the PropertyDialogAction to respect enablesWhen conditions
 		 */
@@ -1215,10 +1218,13 @@ public class LaunchView extends AbstractDebugView
 		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(SUSPEND));
 		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(TERMINATE));
 		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(TERMINATE_AND_RELAUNCH));
-		if (element instanceof IAdaptable && ((IAdaptable)element).getAdapter(IRestartHandler.class) != null) {
-			menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(RESTART));
-		}
-		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(DISCONNECT));
+//		if (element instanceof IAdaptable && ((IAdaptable)element).getAdapter(IRestartHandler.class) != null) {
+//			menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(RESTART));
+//		}
+
+		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(SWITCH));// CUSTOMIZATION FOR Multi-Core Debug
+
+//		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(DISCONNECT));
 
 		menu.appendToGroup(IDebugUIConstants.STEP_INTO_GROUP, getAction(STEP_INTO));
 		menu.appendToGroup(IDebugUIConstants.STEP_OVER_GROUP, getAction(STEP_OVER));

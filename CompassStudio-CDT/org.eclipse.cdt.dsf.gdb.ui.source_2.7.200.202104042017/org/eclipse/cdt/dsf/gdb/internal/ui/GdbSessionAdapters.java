@@ -186,12 +186,14 @@ public class GdbSessionAdapters {
 	 */
 	protected List<Class<?>> getModelAdapters() {
 		// Return a list to which elements can be added
+		// CUSTOMIZATION FOR Multi-Core Debug
 		return new ArrayList<>(Arrays.asList(SteppingController.class, IViewerInputProvider.class,
 				ISteppingModeTarget.class, ISourceDisplay.class, IStepIntoHandler.class,
 				IStepIntoSelectionHandler.class, IReverseStepIntoHandler.class, IStepOverHandler.class,
 				IReverseStepOverHandler.class, IStepReturnHandler.class, IUncallHandler.class, ISuspendHandler.class,
 				IResumeHandler.class, IReverseResumeHandler.class, IResumeWithoutSignalHandler.class,
-				IRestartHandler.class, ITerminateHandler.class, IDebugNewExecutableHandler.class, IConnectHandler.class,
+				IRestartHandler.class, ITerminateHandler.class,
+				IDebugNewExecutableHandler.class, IConnectHandler.class,
 				IDisconnectHandler.class, IModelSelectionPolicyFactory.class, IRefreshAllTarget.class,
 				IReverseToggleHandler.class, IStartTracingHandler.class, IStopTracingHandler.class,
 				ISaveTraceDataHandler.class, ISelectNextTraceRecordHandler.class, ISelectPrevTraceRecordHandler.class,

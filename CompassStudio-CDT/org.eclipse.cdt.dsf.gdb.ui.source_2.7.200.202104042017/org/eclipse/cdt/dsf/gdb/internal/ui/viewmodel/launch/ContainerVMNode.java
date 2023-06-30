@@ -77,6 +77,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IMemento;
 
+import cn.com.armchina.toolchain.core.internal.opencl.services.NPUODBProcess.IMINPUContainerDMContext;
+import cn.com.armchina.toolchain.core.internal.opencl.services.NPUODBProcess.MINPUContainerDMC;
+
 public class ContainerVMNode extends AbstractContainerVMNode implements IElementMementoProvider {
 	/** Indicator that we should not display running threads */
 	private boolean fHideRunningThreadsProperty = false;
@@ -98,6 +101,8 @@ public class ContainerVMNode extends AbstractContainerVMNode implements IElement
 		store.addPropertyChangeListener(fPropertyChangeListener);
 		fHideRunningThreadsProperty = store.getBoolean(IGdbDebugPreferenceConstants.PREF_HIDE_RUNNING_THREADS);
 	}
+
+
 
 	@Override
 	public void dispose() {
@@ -333,6 +338,9 @@ public class ContainerVMNode extends AbstractContainerVMNode implements IElement
 				final IProcessDMContext procDmc = findDmcInPath(update.getViewerInput(), update.getElementPath(),
 						IProcessDMContext.class);
 
+				// IMINPUContainerDMContext
+				IMINPUContainerDMContext cluster = findDmcInPath(update.getViewerInput(), update.getElementPath(), IMINPUContainerDMContext.class);
+
 				if (processService == null || procDmc == null) {
 					update.setStatus(new Status(IStatus.ERROR, GdbUIPlugin.PLUGIN_ID,
 							IDsfStatusConstants.INVALID_HANDLE, "Service or handle invalid", null)); //$NON-NLS-1$
@@ -343,6 +351,11 @@ public class ContainerVMNode extends AbstractContainerVMNode implements IElement
 								public void handleCompleted() {
 									if (isSuccess()) {
 										fillThreadDataProperties(update, getData());
+										// CUSTOMZATION FOR OPENCL Multi-core debug
+										if (cluster != null) {
+											update.setProperty(PROP_NAME,
+													((MINPUContainerDMC) dmc).getNodeType() + ((MINPUContainerDMC) dmc).getId());
+										}
 									} else {
 										update.setStatus(getStatus());
 									}

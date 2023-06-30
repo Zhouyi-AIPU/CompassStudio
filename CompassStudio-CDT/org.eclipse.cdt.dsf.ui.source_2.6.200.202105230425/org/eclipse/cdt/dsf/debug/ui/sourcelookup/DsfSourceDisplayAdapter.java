@@ -504,8 +504,14 @@ public class DsfSourceDisplayAdapter implements ISourceDisplay, ISteppingControl
 			fRegion = getLineInformation(editor, frameData.fLine);
 			if (fRegion != null) {
 				// add annotation
+				// CUSTOMIZATION FOR Multi-Core Debug
+				if (!DMContexts.isAncestorOf(frameData.fDmc, eventContext)) {
+					fIPManager.addAnnotation(editor, frameData.fDmc, new Position(fRegion.getOffset(), fRegion.getLength()), false,
+							false);
+				} else
+
 				fIPManager.addAnnotation(editor, frameData.fDmc, new Position(fRegion.getOffset(), fRegion.getLength()),
-						frameData.fLevel == 0);
+						frameData.fLevel == 0, true);
 
 				// this is a dirty trick to get access to the ITextViewer of the
 				// editor
@@ -673,6 +679,7 @@ public class DsfSourceDisplayAdapter implements ISourceDisplay, ISteppingControl
 	private Set<IRunControl.IExecutionDMContext> fPendingExecDmcsToClear = new HashSet<>();
 	private SteppingController fController;
 
+	private IDMContext eventContext = null;
 	/**
 	 * Delay (in milliseconds) before the selection is changed to the IP
 	 * location
@@ -989,6 +996,8 @@ public class DsfSourceDisplayAdapter implements ISourceDisplay, ISteppingControl
 	@DsfServiceEventHandler
 	public void eventDispatched(final IRunControl.ISuspendedDMEvent e) {
 		updateStepTiming();
+		// CUSTOMIZATION FOR Multi-Core Debug
+		this.eventContext = e.getDMContext();
 		if (e.getReason() == StateChangeReason.STEP || e.getReason() == StateChangeReason.BREAKPOINT) {
 			if (DEBUG) {
 				System.out.println("[DsfSourceDisplayAdapter] eventDispatched e=" + e); //$NON-NLS-1$
@@ -998,6 +1007,7 @@ public class DsfSourceDisplayAdapter implements ISourceDisplay, ISteppingControl
 				Object context = DebugUITools.getDebugContext();
 				if (context instanceof IDMVMContext) {
 					final IDMContext dmc = ((IDMVMContext) context).getDMContext();
+
 					if (dmc instanceof IFrameDMContext && DMContexts.isAncestorOf(dmc, e.getDMContext())) {
 						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 						doDisplaySource((IFrameDMContext) dmc, page, false, true);

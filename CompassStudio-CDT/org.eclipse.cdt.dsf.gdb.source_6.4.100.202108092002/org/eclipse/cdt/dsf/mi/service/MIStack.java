@@ -160,7 +160,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 	 * Same as with frame objects, this is a base class for the IVariableDMData object that uses an MIArg object to
 	 * provide the data.  Sub-classes must supply the MIArg object.
 	 */
-	private static class VariableData implements IVariableDMData {
+	protected static class VariableData implements IVariableDMData {
 		private MIArg fMIArg;
 
 		public VariableData(MIArg arg) {
@@ -183,19 +183,21 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		}
 	}
 
-	private CommandCache fMICommandCache;
-	private CommandFactory fCommandFactory;
+	protected CommandCache fMICommandCache;
+	protected CommandFactory fCommandFactory;
 
 	/**
 	 * Class to track stack depth and debug frames for our internal cache
 	 */
-	private static class FramesCacheInfo {
+	protected static class FramesCacheInfo {
 		// If this set to true our knowledge of stack depths is limited to current depth, i.e
 		// we only know that stack depth is at least "stackDepth" but it could be more
 		private boolean limited = true;
 		// The actual depth we received
 		private int stackDepth = -1;
 		private final List<FrameData> frames = new ArrayList<>();
+		
+		public FramesCacheInfo() {}
 
 		/**
 		 * Return currently cached stack depth if cache value if valid, otherwise return -1.
@@ -334,21 +336,21 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 
 	private FramesCache fFramesCache = new FramesCache();
 
-	private MIStoppedEvent fCachedStoppedEvent;
-	private IRunControl fRunControl;
+	protected MIStoppedEvent fCachedStoppedEvent;
+	protected IRunControl fRunControl;
 
 	/**
 	 * Indicates that we are currently visualizing trace data.
 	 * In this case, some errors should not be reported.
 	 */
-	private boolean fTraceVisualization;
+	protected boolean fTraceVisualization;
 
 	/**
 	 * A Map of a return value for each thread.
 	 * A return value is stored when the user performs a step-return,
 	 * and it cleared as soon as that thread executes again.
 	 */
-	private Map<IMIExecutionDMContext, VariableData> fThreadToReturnVariable = new HashMap<>();
+	protected Map<IMIExecutionDMContext, VariableData> fThreadToReturnVariable = new HashMap<>();
 
 	public MIStack(DsfSession session) {
 		super(session);
@@ -358,7 +360,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 	 * Base class for the IFrameDMData object that uses an MIFrame object to
 	 * provide the data.  Sub-classes must provide the MIFrame object
 	 */
-	private abstract class FrameData implements IFrameDMData {
+	public abstract class FrameData implements IFrameDMData {
 		protected abstract MIFrame getMIFrame();
 
 		@Override
@@ -408,10 +410,10 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		}
 	}
 
-	private class FrameDataFromStoppedEvent extends FrameData {
+	protected class FrameDataFromStoppedEvent extends FrameData {
 		private final MIStoppedEvent fEvent;
 
-		FrameDataFromStoppedEvent(MIStoppedEvent event) {
+		public FrameDataFromStoppedEvent(MIStoppedEvent event) {
 			fEvent = event;
 		}
 
@@ -421,11 +423,11 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		}
 	}
 
-	private class FrameDataFromMIStackFrameListInfo extends FrameData {
+	protected class FrameDataFromMIStackFrameListInfo extends FrameData {
 		private MIStackListFramesInfo fFrameDataCacheInfo;
 		private int fFrameIndex;
 
-		FrameDataFromMIStackFrameListInfo(MIStackListFramesInfo info, int index) {
+		public FrameDataFromMIStackFrameListInfo(MIStackListFramesInfo info, int index) {
 			fFrameDataCacheInfo = info;
 			fFrameIndex = index;
 		}
@@ -451,7 +453,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		});
 	}
 
-	private void doInitialize(RequestMonitor rm) {
+	protected void doInitialize(RequestMonitor rm) {
 		ICommandControlService commandControl = getServicesTracker().getService(ICommandControlService.class);
 		BufferedCommandControl bufferedCommandControl = new BufferedCommandControl(commandControl, getExecutor(), 2);
 
@@ -563,7 +565,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		});
 	}
 
-	private IFrameDMContext[] getDMFrames(final IMIExecutionDMContext execDmc, int startIndex, int endIndex,
+	protected IFrameDMContext[] getDMFrames(final IMIExecutionDMContext execDmc, int startIndex, int endIndex,
 			int stackDepth) {
 		if (endIndex > stackDepth - 1 || endIndex < 0) {
 			endIndex = stackDepth - 1;
@@ -579,11 +581,11 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		return frameDMCs;
 	}
 
-	private ICommand<MIStackListFramesInfo> createMIStackListFrames(final IMIExecutionDMContext execDmc) {
+	protected ICommand<MIStackListFramesInfo> createMIStackListFrames(final IMIExecutionDMContext execDmc) {
 		return fCommandFactory.createMIStackListFrames(execDmc);
 	}
 
-	private ICommand<MIStackListFramesInfo> createMIStackListFrames(final IMIExecutionDMContext execDmc,
+	protected ICommand<MIStackListFramesInfo> createMIStackListFrames(final IMIExecutionDMContext execDmc,
 			final int startIndex, final int endIndex) {
 		final ICommand<MIStackListFramesInfo> miStackListCmd;
 		if (endIndex >= 0) {
@@ -943,7 +945,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 
 	}
 
-	private MIVariableDMC[] makeVariableDMCs(IFrameDMContext frame, MIVariableDMC.Type type, MIArg[] miArgs) {
+	protected MIVariableDMC[] makeVariableDMCs(IFrameDMContext frame, MIVariableDMC.Type type, MIArg[] miArgs) {
 		// Use LinkedHashMap in order to keep the original ordering.
 		// We don't currently support variables with the same name in the same frame,
 		// so we only keep the first one.
@@ -965,7 +967,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 	/**
 	 * Retrieves variables which are used to store the return values of functions.
 	 */
-	private void getReturnValues(IFrameDMContext frameDmc, DataRequestMonitor<IVariableDMContext[]> rm) {
+	protected void getReturnValues(IFrameDMContext frameDmc, DataRequestMonitor<IVariableDMContext[]> rm) {
 		IVariableDMContext[] values = new IVariableDMContext[0];
 
 		// Return values are only relevant for the top stack-frame
@@ -1146,7 +1148,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		handleReturnValues(e);
 	}
 
-	private void handleReturnValues(IResumedDMEvent e) {
+	protected void handleReturnValues(IResumedDMEvent e) {
 		// Whenever the execution resumes, we can clear any
 		// return values of previous methods for the resuming
 		// thread context.  For all-stop mode, we get a container event here,
@@ -1181,7 +1183,7 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		handleReturnValues(e);
 	}
 
-	private void handleReturnValues(ISuspendedDMEvent e) {
+	protected void handleReturnValues(ISuspendedDMEvent e) {
 		// Process MIFunctionFinishedEvent from within the ISuspendedDMEvent
 		// instead of MIStoppedEvent.
 		// This avoids a race conditions where the actual MIFunctionFinishedEvent

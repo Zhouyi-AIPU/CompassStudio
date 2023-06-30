@@ -72,8 +72,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IMemento;
 
-import cn.com.armchina.toolchain.core.dsf.service.INPUThreadDMData;
-
 public class ThreadVMNode extends AbstractThreadVMNode implements IElementMementoProvider {
 	/** Indicator that we should not display running threads */
 	private boolean fHideRunningThreadsProperty = false;
@@ -352,6 +350,7 @@ public class ThreadVMNode extends AbstractThreadVMNode implements IElementMement
 								}
 							});
 					count++;
+
 				}
 			}
 
@@ -382,16 +381,16 @@ public class ThreadVMNode extends AbstractThreadVMNode implements IElementMement
 		
 		//CUSTOMIZATION FOR OPENCL
 		// For X1 : does't display tecInfo
-		if(data instanceof INPUThreadDMData)
-		{
-			INPUThreadDMData npuDMData =(INPUThreadDMData) data;
-			String tecinfo = npuDMData.getWorkItem() + npuDMData.getWorkGroup() + getTecinfo(npuDMData.getTecID());
-			if (npuDMData.getTecID().equals("") || npuDMData.getWorkGroup().equals("")
-					|| npuDMData.getWorkItem().equals("")) {
-				return;
-			}
-			update.setProperty(ILaunchVMConstants.PROP_ID, tecinfo);
-		}
+//		if(data instanceof INPUThreadDMData)
+//		{
+//			INPUThreadDMData npuDMData =(INPUThreadDMData) data;
+//			String tecinfo = npuDMData.getWorkItem() + npuDMData.getWorkGroup();
+//			if (npuDMData.getTecID().equals("") || npuDMData.getWorkGroup().equals("")
+//					|| npuDMData.getWorkItem().equals("")) {
+//				return;
+//			}
+//			update.setProperty(ILaunchVMConstants.PROP_ID, tecinfo);
+//		}
 	}
 
 	private String produceThreadElementName(String viewName, IMIExecutionDMContext execCtx) {
@@ -529,15 +528,6 @@ public class ThreadVMNode extends AbstractThreadVMNode implements IElementMement
 		}
 	}
 
-	private String getTecinfo(String tecinfo) {
-		String lastStr = "";
-		if (tecinfo != null && !tecinfo.equals("")) {
-			tecinfo = tecinfo.substring(1);
-			tecinfo = tecinfo.substring(0, tecinfo.length() - 1);
-			String[] vals = tecinfo.split(",");
-			lastStr = "(Cluster:" + vals[0] + ",Core:" + vals[1] + ",Tec:" + vals[2] + ")";
-		}
-		return lastStr;
-	}
+
 
 }

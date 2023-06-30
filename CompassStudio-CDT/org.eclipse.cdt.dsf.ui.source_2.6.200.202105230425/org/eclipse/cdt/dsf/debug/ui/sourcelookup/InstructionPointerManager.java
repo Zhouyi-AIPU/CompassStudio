@@ -24,6 +24,7 @@ import org.eclipse.cdt.dsf.debug.service.IRunControl;
 import org.eclipse.cdt.dsf.debug.service.IRunControl.IExecutionDMContext;
 import org.eclipse.cdt.dsf.debug.service.IStack;
 import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMContext;
+import org.eclipse.cdt.dsf.debug.service.command.ICommandControlService.ICommandControlDMContext;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.text.Position;
@@ -42,7 +43,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * This class tracks instruction pointer contexts for a single DSF session.
  */
 @ThreadSafe
-class InstructionPointerManager {
+public class InstructionPointerManager {
 
 	/**
 	 * Current instruction pointer annotation type.
@@ -216,8 +217,9 @@ class InstructionPointerManager {
 	 * Add an instruction pointer annotation in the specified editor for the
 	 * specified stack frame.
 	 */
+	// CUSTOMIZATION FOR Multi-Core Debug
 	public void addAnnotation(ITextEditor textEditor, IStack.IFrameDMContext frame, Position position,
-			boolean isTopFrame) {
+			boolean isTopFrame, boolean isCurrentTec) {
 
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IEditorInput editorInput = textEditor.getEditorInput();
@@ -231,7 +233,7 @@ class InstructionPointerManager {
 			// remove other top-frame IP annotation(s) for this execution-context
 			removeAnnotations(DMContexts.getAncestorOfType(frame.getParents()[0], IExecutionDMContext.class));
 		}
-		Annotation annotation = createAnnotation(textEditor, frame);
+		Annotation annotation = createAnnotation(textEditor, frame, isCurrentTec);
 
 		// Add the annotation at the position to the editor's annotation model.
 		annModel.removeAnnotation(annotation);
@@ -243,7 +245,7 @@ class InstructionPointerManager {
 		}
 	}
 
-	private Annotation createAnnotation(ITextEditor editorPart, IStack.IFrameDMContext frame) {
+	private Annotation createAnnotation(ITextEditor editorPart, IStack.IFrameDMContext frame, boolean isCurrentTec) {
 		String id = null;
 		String text = null;
 		Image image = null;
@@ -258,8 +260,9 @@ class InstructionPointerManager {
 			}
 			text = fPresentation.getInstructionPointerText(editorPart, frame);
 		}
+
 		if (id == null) {
-			if (frame.getLevel() == 0) {
+			if (frame.getLevel() == 0 && isCurrentTec) {
 				id = ID_CURRENT_IP;
 				if (text == null) {
 					text = Messages.IPAnnotation_primary;
@@ -288,9 +291,12 @@ class InstructionPointerManager {
 	public void removeAnnotations(IRunControl.IExecutionDMContext execDmc) {
 		// Retrieve the mapping of threads to context lists
 		synchronized (fAnnotationWrappers) {
+			// CUSTOMIZATION FOR Multi-Core Debug
+			// remove the same command control ctx annotations
+			ICommandControlDMContext control = DMContexts.getAncestorOfType(execDmc, ICommandControlDMContext.class);
 			for (Iterator<AnnotationWrapper> wrapperItr = fAnnotationWrappers.iterator(); wrapperItr.hasNext();) {
 				AnnotationWrapper wrapper = wrapperItr.next();
-				if (DMContexts.isAncestorOf(wrapper.getFrameDMC(), execDmc)) {
+				if (DMContexts.isAncestorOf(wrapper.getFrameDMC(), control)) {
 					removeAnnotation(wrapper.getTextEditor(), wrapper.getAnnotation());
 					wrapperItr.remove();
 				}

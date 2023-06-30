@@ -57,6 +57,7 @@ public class DebugPluginImages {
 	private final static String WIZBAN= ICONS_PATH + "wizban/"; //basic colors - size 16x16 //$NON-NLS-1$
 	private final static String OVR= ICONS_PATH + "ovr16/"; //basic colors - size 7x8 //$NON-NLS-1$
 	private final static String VIEW= ICONS_PATH + "eview16/"; // views //$NON-NLS-1$
+	private final static String POPMENU = ICONS_PATH + "dview16/"; // views //$NON-NLS-1$
 
 	/**
 	 * Declare all images
@@ -72,6 +73,9 @@ public class DebugPluginImages {
 		declareRegistryImage(IDebugUIConstants.IMG_LCL_CHANGE_VARIABLE_VALUE, ELCL + "changevariablevalue_co.png"); //$NON-NLS-1$
 		declareRegistryImage(IInternalDebugUIConstants.IMG_DLCL_CHANGE_VARIABLE_VALUE, DLCL + "changevariablevalue_co.png"); //$NON-NLS-1$
 		declareRegistryImage(IInternalDebugUIConstants.IMG_ELCL_CHANGE_VARIABLE_VALUE, ELCL + "changevariablevalue_co.png"); //$NON-NLS-1$
+
+		declareRegistryImage(IDebugUIConstants.IMG_SWITCH, POPMENU + "switch_to.png"); // CUSTOMIZATION FOR Multi-Core
+																						// Debug
 
 		declareRegistryImage(IDebugUIConstants.IMG_LCL_CONTENT_ASSIST, ELCL + "metharg_obj.png"); //$NON-NLS-1$
 		declareRegistryImage(IDebugUIConstants.IMG_DLCL_CONTENT_ASSIST, DLCL + "metharg_obj.png"); //$NON-NLS-1$

@@ -505,7 +505,7 @@
                   attribute="value"
                   extensionAdjustment="false"
                   type="CONTAINER_ATTRIBUTE"
-                  value="llvm.c_cpp.compiler.optimization.level.most">
+                  value="llvm.c_cpp.compiler.optimization.level.more">
                <checkBuildProperty
                      property="org.eclipse.cdt.build.core.buildType"
                      value="org.eclipse.cdt.build.core.buildType.release">
@@ -821,7 +821,7 @@
                   attribute="value"
                   extensionAdjustment="false"
                   type="CONTAINER_ATTRIBUTE"
-                  value="llvm.c_cpp.compiler.optimization.level.most">
+                  value="llvm.c_cpp.compiler.optimization.level.more">
                <checkBuildProperty
                      property="org.eclipse.cdt.build.core.buildType"
                      value="org.eclipse.cdt.build.core.buildType.release">

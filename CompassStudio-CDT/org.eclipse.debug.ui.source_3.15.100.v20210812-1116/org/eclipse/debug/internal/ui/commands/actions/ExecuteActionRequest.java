@@ -49,7 +49,8 @@ public class ExecuteActionRequest extends DebugCommandRequest {
 					DebugUIPlugin.getStandardDisplay().asyncExec(() -> MessageDialog.openWarning(DebugUIPlugin.getShell(), DebugUIMessages.DebugUITools_Error_1, status.getMessage()));
 				break;
 			case IStatus.INFO:
-					DebugUIPlugin.getStandardDisplay().asyncExec(() -> MessageDialog.openInformation(DebugUIPlugin.getShell(), DebugUIMessages.DebugUITools_Error_1, status.getMessage()));
+				DebugUIPlugin.getStandardDisplay().asyncExec(
+						() -> MessageDialog.openInformation(DebugUIPlugin.getShell(), DebugUIMessages.DebugUITools_Info_1, status.getMessage()));
 				break;
 				default:
 					break;

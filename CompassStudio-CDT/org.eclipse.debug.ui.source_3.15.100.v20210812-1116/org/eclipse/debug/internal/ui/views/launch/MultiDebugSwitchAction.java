@@ -16,7 +16,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 public class MultiDebugSwitchAction extends DebugCommandAction {
 
 	public MultiDebugSwitchAction() {
-		setActionDefinitionId("org.eclipse.debug.ui.commands.Restart"); //$NON-NLS-1$
+		setActionDefinitionId("org.eclipse.debug.ui.commands.select"); //$NON-NLS-1$
 	}
 
 	@Override

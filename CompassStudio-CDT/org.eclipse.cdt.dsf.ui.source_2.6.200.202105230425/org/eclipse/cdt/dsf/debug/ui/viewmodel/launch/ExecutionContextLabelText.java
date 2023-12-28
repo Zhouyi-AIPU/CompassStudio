@@ -58,7 +58,8 @@ public class ExecutionContextLabelText extends LabelText {
 			if (reason == null) {
 				// In non-stop mode threads that are running have no state change reason
 				reasonLabel = ""; //$NON-NLS-1$
-			} else if (StateChangeReason.BREAKPOINT.name().equals(reason)) {
+			} else if (StateChangeReason.BREAKPOINT.name().equals(reason)
+					|| StateChangeReason.SWITCH_TEC.name().equals(reason)) { // CUSTOMIZATION FOR Multi-Core Debug
 				reasonLabel = MessagesForLaunchVM.State_change_reason__Breakpoint__label;
 			} else if (StateChangeReason.CONTAINER.name().equals(reason)) {
 				reasonLabel = MessagesForLaunchVM.State_change_reason__Container__label;

@@ -72,8 +72,10 @@ public class OpenCLMainTab extends CMainTab {
 			String filePath = objectFilePath + File.separator + fileName;
 			boolean exits = new File(filePath).exists();
 			if (exits) {
-				String[] sp = filePath.split(projectPath + File.separator);
-				config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, sp[1]);
+				// String[] sp = filePath.split(projectPath + File.separator);
+				// fix bug : file path like **/runtime-New_configuration(1)/** can't be parse correctly.
+				String sp = filePath.substring(projectPath.length() + 1, filePath.length());
+				config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, sp);
 				if (!renamed) {
 					String name = fileName;
 					int index = name.lastIndexOf('.');

@@ -75,7 +75,7 @@ public class DebugPluginImages {
 		declareRegistryImage(IInternalDebugUIConstants.IMG_ELCL_CHANGE_VARIABLE_VALUE, ELCL + "changevariablevalue_co.png"); //$NON-NLS-1$
 
 		declareRegistryImage(IDebugUIConstants.IMG_SWITCH, POPMENU + "switch_to.png"); // CUSTOMIZATION FOR Multi-Core
-																						// Debug
+		declareRegistryImage(IDebugUIConstants.IMG_REFRESH_TEC, POPMENU + "refresh_tec.gif");																				// Debug
 
 		declareRegistryImage(IDebugUIConstants.IMG_LCL_CONTENT_ASSIST, ELCL + "metharg_obj.png"); //$NON-NLS-1$
 		declareRegistryImage(IDebugUIConstants.IMG_DLCL_CONTENT_ASSIST, DLCL + "metharg_obj.png"); //$NON-NLS-1$

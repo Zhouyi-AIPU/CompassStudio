@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Text;
  */
 @Deprecated
 public class CMainTab extends CMainTab2 {
+	protected String progLabel = "Compass C Application:";
 	public CMainTab() {
 		super();
 	}
@@ -146,7 +147,7 @@ public class CMainTab extends CMainTab2 {
 		gd.horizontalSpan = colSpan;
 		mainComp.setLayoutData(gd);
 		fProgLabel = new Label(mainComp, SWT.NONE);
-		fProgLabel.setText("Compass C Application:");
+		fProgLabel.setText(progLabel);
 		gd = new GridData();
 		fProgLabel.setLayoutData(gd);
 		fProgText = new Text(mainComp, SWT.SINGLE | SWT.BORDER);

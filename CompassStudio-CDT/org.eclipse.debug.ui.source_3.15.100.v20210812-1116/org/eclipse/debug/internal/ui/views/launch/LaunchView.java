@@ -47,6 +47,7 @@ import org.eclipse.debug.internal.ui.IDebugHelpContextIds;
 import org.eclipse.debug.internal.ui.actions.AddToFavoritesAction;
 import org.eclipse.debug.internal.ui.actions.EditLaunchConfigurationAction;
 import org.eclipse.debug.internal.ui.commands.actions.DropToFrameCommandAction;
+import org.eclipse.debug.internal.ui.commands.actions.RefreshTecCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.ResumeCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.StepIntoCommandAction;
 import org.eclipse.debug.internal.ui.commands.actions.StepOverCommandAction;
@@ -169,12 +170,17 @@ public class LaunchView extends AbstractDebugView
 	private static final String RESTART = "restart"; //$NON-NLS-1$
 
 	private static final String SWITCH = "switch"; //$NON-NLS-1$
+	
+	private static final String REFRESH_TEC = "refresh_tec";
+
+	private static final String TOGGLE_SINGLE_MODE = "toggle_single_mode";
 
 	private static final int BREADCRUMB_TRIGGER_HEIGHT_DEFAULT = 30; // pixels
 
 	private static final int BREADCRUMB_TRIGGER_RANGE = 5; // pixels
 
 	private static final int BREADCRUMB_STICKY_RANGE = 20; // pixels
+
 
 	/**
 	 * Whether this view is in the active page of a perspective.
@@ -535,7 +541,7 @@ public class LaunchView extends AbstractDebugView
 		setAction(FIND_ACTION, new VirtualFindAction((TreeModelViewer) getViewer()));
 
 		addCapabilityAction(new TerminateCommandAction(), TERMINATE);
-//		addCapabilityAction(new DisconnectCommandAction(), DISCONNECT);
+		//addCapabilityAction(new DisconnectCommandAction(), DISCONNECT);
 		addCapabilityAction(new SuspendCommandAction(), SUSPEND);
 		addCapabilityAction(new ResumeCommandAction(), RESUME);
 		addCapabilityAction(new StepReturnCommandAction(), STEP_RETURN);
@@ -551,6 +557,8 @@ public class LaunchView extends AbstractDebugView
 //		addCapabilityAction(new RestartCommandAction(), RESTART);
 
 		addCapabilityAction(new MultiDebugSwitchAction(), SWITCH);// CUSTOMIZATION FOR Multi-Core Debug
+		addCapabilityAction(new RefreshTecCommandAction(), REFRESH_TEC); // CUSTOMIZATION FOR Multi-Core Debug
+		// addCapabilityAction(new ToggleSingleModeAction(), TOGGLE_SINGLE_MODE); // CUSTOMIZATION FOR Multi-Core Debug
 
 		action = new TerminateAllAction();
 		addCapabilityAction(action, TERMINATE_ALL);
@@ -1223,8 +1231,10 @@ public class LaunchView extends AbstractDebugView
 //		}
 
 		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(SWITCH));// CUSTOMIZATION FOR Multi-Core Debug
+		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(REFRESH_TEC)); // CUSTOMIZATION FOR Multi-Core Debug
+		// menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(TOGGLE_SINGLE_MODE)); // CUSTOMIZATION FOR Multi-Core Debug
 
-//		menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(DISCONNECT));
+    //	menu.appendToGroup(IDebugUIConstants.THREAD_GROUP, getAction(DISCONNECT));
 
 		menu.appendToGroup(IDebugUIConstants.STEP_INTO_GROUP, getAction(STEP_INTO));
 		menu.appendToGroup(IDebugUIConstants.STEP_OVER_GROUP, getAction(STEP_OVER));

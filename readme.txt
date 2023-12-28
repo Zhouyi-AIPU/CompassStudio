@@ -16,5 +16,6 @@ Required:
 
 License:
     EPL_v2.0
+    LGPL
     
 

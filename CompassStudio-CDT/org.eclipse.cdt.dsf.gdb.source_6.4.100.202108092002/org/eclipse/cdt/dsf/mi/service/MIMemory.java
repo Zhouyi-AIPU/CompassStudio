@@ -468,11 +468,13 @@ public class MIMemory extends AbstractDsfService implements IMemory, ICachingSer
 	    {
 			fCommandCache.removeAllAvailableContext();
 	    }
+		IMemoryDMContext memoryDMC = DMContexts.getAncestorOfType(e.getDMContext(), IMemoryDMContext.class);
 		if (e instanceof IContainerSuspendedDMEvent) {
-			fCommandCache.setContextAvailable(e.getDMContext(), true);
+		
+			fCommandCache.setContextAvailable(memoryDMC, true);
 		}
 
-		IMemoryDMContext memoryDMC = DMContexts.getAncestorOfType(e.getDMContext(), IMemoryDMContext.class);
+		
 		// It is the memory context we want to clear, not only the context that stopped.  The stopped context
 		// is probably a thread but that thread that ran could have changed any memory within the memory
 		// context.

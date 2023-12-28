@@ -56,6 +56,7 @@ public class DebugUIMessages extends NLS {
 
 	public static String DebugUITools_3;
 	public static String DebugUITools_Error_1;
+	public static String DebugUITools_Info_1;
 	public static String DebugUITools_Exception_occurred_during_launch_2;
 
 	public static String InstructionPointerAnnotation_0;

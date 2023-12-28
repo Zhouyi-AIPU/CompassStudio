@@ -412,30 +412,6 @@ public class Keywords {
 		words.put(Keywords.cVOLATILE, IToken.t_volatile);
 		words.put(Keywords.cWHILE, IToken.t_while);
 		words.put(Keywords.cASM, IToken.t_asm);
-		// CUSTOMIZATION
-		words.put(Keywords.c_kernel, IToken.t_int);
-		words.put(Keywords.ckernel, IToken.t_int);
-		words.put(Keywords.c_entry, IToken.t_int);
-
-		words.put(Keywords.c_lsram, IToken.t_volatile);
-		words.put(Keywords.clocal, IToken.t_volatile);
-		words.put(Keywords.c_local, IToken.t_volatile);
-		words.put(Keywords.cglobal, IToken.t_volatile);
-		words.put(Keywords.c_global, IToken.t_volatile);
-		words.put(Keywords.cprivate, IToken.t_volatile);
-		words.put(Keywords.c_private, IToken.t_volatile);
-		words.put(Keywords.cconstant, IToken.t_volatile);
-		words.put(Keywords.c_constant, IToken.t_volatile);
-		words.put(Keywords.cgsram0, IToken.t_volatile);
-		words.put(Keywords.c_gsram0, IToken.t_volatile);
-		words.put(Keywords.cgsram1, IToken.t_volatile);
-		words.put(Keywords.c_gsram1, IToken.t_volatile);
-		words.put(Keywords.clsram0, IToken.t_volatile);
-		words.put(Keywords.c_lsram0, IToken.t_volatile);
-		words.put(Keywords.clsram1, IToken.t_volatile);
-		words.put(Keywords.c_lsram1, IToken.t_volatile);
-		words.put(Keywords.c_half, IToken.t_half);
-		words.put(Keywords.c_event_t, IToken.t_event_t);
 	}
 
 	// ANSI C keywords
@@ -451,6 +427,32 @@ public class Keywords {
 		ckeywords.put(Keywords.cTRUE, IToken.t_true);
 		ckeywords.put(Keywords.cFALSE, IToken.t_false);
 		ckeywords.put(Keywords.cBOOL, IToken.t_bool);
+		
+		 //CUSTOMIZATION :main function entry define
+		ckeywords.put(Keywords.c_kernel, IToken.t_int);
+		ckeywords.put(Keywords.ckernel, IToken.t_int);
+		ckeywords.put(Keywords.c_entry, IToken.t_int);
+		
+		 //CUSTOMIZATION :key word define
+		ckeywords.put(Keywords.c_lsram, IToken.t_volatile);
+		ckeywords.put(Keywords.clocal, IToken.t_volatile);
+		ckeywords.put(Keywords.c_local, IToken.t_volatile);
+		ckeywords.put(Keywords.cglobal, IToken.t_volatile);
+		ckeywords.put(Keywords.c_global, IToken.t_volatile);
+		ckeywords.put(Keywords.cprivate, IToken.t_volatile);
+		ckeywords.put(Keywords.c_private, IToken.t_volatile);
+		ckeywords.put(Keywords.cconstant, IToken.t_volatile);
+		ckeywords.put(Keywords.c_constant, IToken.t_volatile);
+		ckeywords.put(Keywords.cgsram0, IToken.t_volatile);
+		ckeywords.put(Keywords.c_gsram0, IToken.t_volatile);
+		ckeywords.put(Keywords.cgsram1, IToken.t_volatile);
+		ckeywords.put(Keywords.c_gsram1, IToken.t_volatile);
+		ckeywords.put(Keywords.clsram0, IToken.t_volatile);
+		ckeywords.put(Keywords.c_lsram0, IToken.t_volatile);
+		ckeywords.put(Keywords.clsram1, IToken.t_volatile);
+		ckeywords.put(Keywords.c_lsram1, IToken.t_volatile);
+		ckeywords.put(Keywords.c_half, IToken.t_half);
+		ckeywords.put(Keywords.c_event_t, IToken.t_event_t);
 
 	}
 

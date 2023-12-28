@@ -115,7 +115,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		// CUSTOMIZATION
 		createSingleTecControl(composite);
 		createLabel(composite, "Debug Mode:     ");
-		comboPlatform = createReadOnlyCCombo(composite, platform_type);
+		comboPlatform = createCustomizedDebugModeCombo(composite);
 		GridData layoutData = new GridData();
 		layoutData.horizontalAlignment = SWT.FILL;
 		layoutData.grabExcessHorizontalSpace = false;
@@ -200,6 +200,11 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	}
 
 	public void createSingleTecControl(Composite composite) {
+	}
+
+	// debug operate plugin only can on simulator
+	public CCombo createCustomizedDebugModeCombo(Composite composite) {
+		return createReadOnlyCCombo(composite, platform_type);
 	}
 
 	public Combo createCustomizedTargerCombo(Group group) {
@@ -512,23 +517,26 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 		try {
 			// get default ir path
 			String projectName = configuration.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
+			if (projectName.equals(""))
+				return;
 			pro = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			if (pro.exists()) {
-				String irFolder = AIPULaunchPathUtils.getIRFolderPath(pro);
-				if (irFolder.equals(""))
-					return;
-				File file = new File(irFolder);
-				File[] filelists = file.listFiles();
 				String irPath = "";
 				String weightPath = "";
-				for (int i = 0; i < filelists.length; i++) {
-					File tmp = filelists[i];
-					if (tmp.getName().endsWith(".txt")) {
-						irPath = tmp.getAbsolutePath();
-					} else if (tmp.getName().endsWith(".bin")) {
-						weightPath = tmp.getAbsolutePath();
+				String irFolder = AIPULaunchPathUtils.getIRFolderPath(pro); // fix : if ir folder is null, ir and weight path is "";
+				if (!irFolder.equals("")) {
+					File file = new File(irFolder);
+					File[] filelists = file.listFiles();
+					for (int i = 0; i < filelists.length; i++) {
+						File tmp = filelists[i];
+						if (tmp.getName().endsWith(".txt")) {
+							irPath = tmp.getAbsolutePath();
+						} else if (tmp.getName().endsWith(".bin")) {
+							weightPath = tmp.getAbsolutePath();
+						}
 					}
 				}
+
 				initialCustomizationFrom(configuration);
 
 				comboPlatform.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE, 0));

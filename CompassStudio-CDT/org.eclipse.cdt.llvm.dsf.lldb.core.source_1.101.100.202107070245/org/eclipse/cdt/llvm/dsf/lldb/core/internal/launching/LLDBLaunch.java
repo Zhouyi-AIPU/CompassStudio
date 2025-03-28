@@ -11,6 +11,7 @@
 
 package org.eclipse.cdt.llvm.dsf.lldb.core.internal.launching;
 
+import cn.com.armchina.ide.preferences.GlobalPreference;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.parser.util.StringUtil;
+import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.cdt.dsf.gdb.launching.GdbLaunch;
 import org.eclipse.cdt.llvm.dsf.lldb.core.ILLDBDebugPreferenceConstants;
 import org.eclipse.cdt.llvm.dsf.lldb.core.ILLDBLaunchConfigurationConstants;
@@ -31,6 +33,8 @@ import org.eclipse.cdt.llvm.dsf.lldb.core.internal.LLDBCorePlugin;
 import org.eclipse.cdt.llvm.dsf.lldb.core.internal.LLDBTrait;
 import org.eclipse.cdt.utils.CommandLineUtil;
 import org.eclipse.cdt.utils.spawner.ProcessFactory;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,21 +57,20 @@ public class LLDBLaunch extends GdbLaunch {
 	private static final IntegerTuple LLDB_MINIMUM_REVISION = new IntegerTuple(350, 0, 21, 9);
 	private static final IntegerTuple LLDB_MINIMUM_VERSION = new IntegerTuple(3, 8, 0);
 	private static final Pattern LLDB_VERSION_PATTERN = Pattern.compile("lldb\\s*version\\s*(\\d+)\\.(\\d+)\\.(\\d+).*", //$NON-NLS-1$
-			Pattern.DOTALL); //;
+			Pattern.DOTALL); // ;
 	private static final Pattern LLDB_REVISION_PATTERN = Pattern.compile("lldb-(\\d+)\\.(\\d+)\\.(\\d+)(\\.(\\d)+)?.*", //$NON-NLS-1$
 			Pattern.DOTALL);
 
 	private Optional<IntegerTuple> fLldbVersion;
 	private Optional<IntegerTuple> fLldbRevision;
 	private Set<LLDBTrait> fTraits = new HashSet<>();
-
+	public String OPENCL_NATURE_ID = "cn.com.armchina.ide.openclnature"; 
+	
 	/**
 	 * Constructs a launch.
 	 *
-	 * @param launchConfiguration
-	 *            the launch configuration
-	 * @param mode
-	 *            the launch mode, i.e., debug, profile, etc.
+	 * @param launchConfiguration the launch configuration
+	 * @param mode                the launch mode, i.e., debug, profile, etc.
 	 * @param locator
 	 */
 	public LLDBLaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
@@ -75,8 +78,8 @@ public class LLDBLaunch extends GdbLaunch {
 	}
 
 	/*
-	 * TODO: GdbLaunch.getGDBPath() and setGDBPath() should reference each other
-	 * in the javadoc to make sure extenders override both.
+	 * TODO: GdbLaunch.getGDBPath() and setGDBPath() should reference each other in
+	 * the javadoc to make sure extenders override both.
 	 */
 	@Override
 	public IPath getGDBPath() {
@@ -93,11 +96,32 @@ public class LLDBLaunch extends GdbLaunch {
 		setAttribute(ILLDBLaunchConfigurationConstants.ATTR_DEBUG_NAME, path);
 	}
 
+	// CUSTOMIZATION FOR LIB
+	@Override
+	public String[] getLaunchEnvironment() throws CoreException {
+
+		String[] launchEnv = super.getLaunchEnvironment();
+		String projectName = getLaunchConfiguration().getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
+		IProject pro = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		String natureID =pro.getDescription().getNatureIds()[0];
+		if (natureID.equals(OPENCL_NATURE_ID)) {
+			return launchEnv;
+		}else {
+			for (int i = 0; i < launchEnv.length; i++) {
+				if (launchEnv[i].contains("LD_LIBRARY_PATH")) {
+					launchEnv[i] = launchEnv[i] + ":" + GlobalPreference.getPathSimulatorLib();
+					break;
+				}
+			}
+		}
+
+		return launchEnv;
+	}
+
 	/**
 	 * Get the LLDB path based on a launch configuration.
 	 *
-	 * @param configuration
-	 *            the launch configuration.
+	 * @param configuration the launch configuration.
 	 * @return the LLDB path
 	 */
 	public static IPath getLLDBPath(ILaunchConfiguration configuration) {
@@ -149,7 +173,8 @@ public class LLDBLaunch extends GdbLaunch {
 			return;
 		}
 
-		// Initialize to non-null here so that we don't try to retrieve the version and spawn a process repeatedly.
+		// Initialize to non-null here so that we don't try to retrieve the version and
+		// spawn a process repeatedly.
 		fLldbRevision = Optional.empty();
 		fLldbVersion = Optional.empty();
 
@@ -262,12 +287,10 @@ public class LLDBLaunch extends GdbLaunch {
 	/**
 	 * Read from the specified stream and return what was read.
 	 *
-	 * @param stream
-	 *            The input stream to be used to read the data. This method will
-	 *            close the stream.
+	 * @param stream The input stream to be used to read the data. This method will
+	 *               close the stream.
 	 * @return The data read from the stream
-	 * @throws IOException
-	 *             If an IOException happens when reading the stream
+	 * @throws IOException If an IOException happens when reading the stream
 	 */
 	private static String readStream(InputStream stream) throws IOException {
 		StringBuilder cmdOutput = new StringBuilder(200);
@@ -340,8 +363,7 @@ public class LLDBLaunch extends GdbLaunch {
 	/**
 	 * This depends on the SVN revision, for example 350.0.21.9
 	 *
-	 * @param versionOutput
-	 *            output text from "lldb --version" command .
+	 * @param versionOutput output text from "lldb --version" command .
 	 * @return String representation of revision of lldb such as "350.0.21.9" on
 	 *         success; null otherwise.
 	 */
@@ -375,10 +397,9 @@ public class LLDBLaunch extends GdbLaunch {
 	/**
 	 * Returns Clang-style/LLVM version, for example 3.9.0
 	 *
-	 * @param versionOutput
-	 *            output text from "lldb --version" command .
-	 * @return String representation of version of lldb such as "3.9.0" on
-	 *         success; null otherwise.
+	 * @param versionOutput output text from "lldb --version" command .
+	 * @return String representation of version of lldb such as "3.9.0" on success;
+	 *         null otherwise.
 	 */
 	private static Optional<IntegerTuple> getLLDBVersionFromText(String versionOutput) {
 		// These are the LLDB version patterns I have seen up to now
@@ -418,8 +439,7 @@ public class LLDBLaunch extends GdbLaunch {
 	/**
 	 * Returns whether or not the LLDB use by this launch has the given trait.
 	 *
-	 * @param trait
-	 *            the trait to check
+	 * @param trait the trait to check
 	 * @return if the launch has this trait for the LLDB, false otherwise
 	 */
 	public boolean hasTrait(LLDBTrait trait) {

@@ -107,7 +107,7 @@ public class GDBRunControl extends MIRunControl {
 	private IGDBBackend fGdb;
 	private IMIProcesses fProcService;
 	private CommandFactory fCommandFactory;
-	private ICommandControlService fConnection;
+	protected ICommandControlService fConnection;
 
 	// Record list of execution contexts
 	private IExecutionDMContext[] fOldExecutionCtxts;

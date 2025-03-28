@@ -1257,4 +1257,9 @@ public class MIStack extends AbstractDsfService implements IStack, ICachingServi
 		fCachedStoppedEvent = null;
 	}
 
+	//// CUSTOMIZATION FOR LAYER DEBUG
+	public MIStoppedEvent getfCachedStoppedEvent() {
+		return fCachedStoppedEvent;
+	}
+
 }

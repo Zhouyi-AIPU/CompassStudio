@@ -48,6 +48,9 @@ import org.eclipse.cdt.dsf.debug.ui.viewmodel.SteppingController;
 import org.eclipse.cdt.dsf.debug.ui.viewmodel.SteppingController.ISteppingControlParticipant;
 import org.eclipse.cdt.dsf.debug.ui.viewmodel.SteppingController.SteppingTimedOutEvent;
 import org.eclipse.cdt.dsf.internal.ui.DsfUIPlugin;
+import org.eclipse.cdt.dsf.mi.service.MIStack;
+import org.eclipse.cdt.dsf.mi.service.command.events.MIStoppedEvent;
+import org.eclipse.cdt.dsf.mi.service.command.output.MIResult;
 import org.eclipse.cdt.dsf.service.DsfServiceEventHandler;
 import org.eclipse.cdt.dsf.service.DsfServicesTracker;
 import org.eclipse.cdt.dsf.service.DsfSession;
@@ -783,6 +786,26 @@ public class DsfSourceDisplayAdapter implements ISourceDisplay, ISteppingControl
 		} else if (context instanceof IFrameDMContext) {
 			displayFrame = (IFrameDMContext) context;
 		}
+		//// CUSTOMIZATION FOR LAYER DEBUG
+		boolean isStopAtLayerDebugEntry = false;
+		IStack stackService = fServicesTracker.getService(IStack.class);
+		if (stackService instanceof MIStack) {
+			MIStoppedEvent e = ((MIStack) stackService).getfCachedStoppedEvent();
+			if (e!=null) {
+				MIResult[] results = e.getResults();
+				for (MIResult result : results) {
+					if (result.getVariable().equals("reason")) {
+						String reasonval = result.getMIValue().toString();
+						if (reasonval.equals("signal SIGTRAP")) {
+							isStopAtLayerDebugEntry = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		if (isStopAtLayerDebugEntry)
+			return;
 
 		// Quick test. DMC is checked again in source lookup participant, but
 		// it's much quicker to test here.

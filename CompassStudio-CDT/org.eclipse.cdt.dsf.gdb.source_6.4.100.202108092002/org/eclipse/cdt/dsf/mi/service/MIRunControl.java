@@ -398,15 +398,15 @@ public class MIRunControl extends AbstractDsfService implements IMIRunControl, I
 		}
 	}
 
-	private ICommandControlService fConnection;
-	private CommandCache fMICommandCache;
+	protected ICommandControlService fConnection;
+	public CommandCache fMICommandCache;
 	private CommandFactory fCommandFactory;
 
 	// State flags
 	private boolean fSuspended = true;
-	private boolean fResumePending = false;
-	private boolean fStepping = false;
-	private boolean fTerminated = false;
+	public boolean fResumePending = false;
+	public boolean fStepping = false;
+	public boolean fTerminated = false;
 	/**
 	 * @since 4.2
 	 */

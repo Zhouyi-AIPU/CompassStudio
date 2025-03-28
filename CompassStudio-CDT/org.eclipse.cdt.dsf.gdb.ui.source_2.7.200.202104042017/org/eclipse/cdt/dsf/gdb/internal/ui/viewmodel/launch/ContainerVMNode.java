@@ -76,7 +76,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IMemento;
-
 import cn.com.armchina.toolchain.core.internal.opencl.services.NPUODBProcess.IMINPUContainerDMContext;
 import cn.com.armchina.toolchain.core.internal.opencl.services.NPUODBProcess.MINPUContainerDMC;
 

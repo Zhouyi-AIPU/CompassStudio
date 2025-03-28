@@ -65,9 +65,9 @@ import org.eclipse.core.runtime.Status;
  * @since 4.0
  */
 public class StartOrRestartProcessSequence_7_0 extends ReflectionSequence {
-	private IGDBControl fCommandControl;
-	private CommandFactory fCommandFactory;
-	private IGDBProcesses fProcService;
+	public IGDBControl fCommandControl;
+	public CommandFactory fCommandFactory;
+	public IGDBProcesses fProcService;
 	private IReverseRunControl fReverseService;
 	private IGDBBackend fBackend;
 
@@ -77,7 +77,7 @@ public class StartOrRestartProcessSequence_7_0 extends ReflectionSequence {
 	// but once the new process is started (restarted), it will contain the new
 	// container context.  This new container context has for parent the process
 	// context, which holds the new pid.
-	private IContainerDMContext fContainerDmc;
+	public IContainerDMContext fContainerDmc;
 
 	// If the user requested a stop_on_main, this variable will hold the breakpoint
 	private MIBreakpoint fUserBreakpoint;
@@ -88,7 +88,7 @@ public class StartOrRestartProcessSequence_7_0 extends ReflectionSequence {
 
 	private MIBreakpoint fBreakPointForReverse;
 	private boolean fReverseEnabled;
-	private final Map<String, Object> fAttributes;
+	public final Map<String, Object> fAttributes;
 
 	// Indicates if the sequence is being used for a restart or a start
 	private final boolean fRestart;
@@ -98,7 +98,7 @@ public class StartOrRestartProcessSequence_7_0 extends ReflectionSequence {
 	// Store the dataRM so that we can fill it with the new container context, which we must return
 	// Although we can access this through Sequence.getRequestMonitor(), we would loose the type-checking.
 	// Therefore, doing it like this is more future-proof.
-	private final DataRequestMonitor<IContainerDMContext> fDataRequestMonitor;
+	public final DataRequestMonitor<IContainerDMContext> fDataRequestMonitor;
 
 	protected IContainerDMContext getContainerContext() {
 		return fContainerDmc;

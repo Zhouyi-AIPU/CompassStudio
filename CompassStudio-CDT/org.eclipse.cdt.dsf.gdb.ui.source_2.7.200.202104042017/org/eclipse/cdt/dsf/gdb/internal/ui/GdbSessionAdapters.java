@@ -241,7 +241,7 @@ public class GdbSessionAdapters {
 					: null;
 		}
 		if (IStepIntoHandler.class.equals(adapterType)) {
-			return (T) new DsfStepIntoCommand(session, getSteppingModeTarget());
+			return (T) new DsfStepIntoCommand(session, getSteppingModeTarget(),getLaunch());
 		}
 		if (IStepIntoSelectionHandler.class.equals(adapterType)) {
 			return (T) new DsfStepIntoSelectionCommand(session);
@@ -250,7 +250,7 @@ public class GdbSessionAdapters {
 			return (T) new GdbReverseStepIntoCommand(session, getSteppingModeTarget());
 		}
 		if (IStepOverHandler.class.equals(adapterType)) {
-			return (T) new DsfStepOverCommand(session, getSteppingModeTarget());
+			return (T) new DsfStepOverCommand(session, getSteppingModeTarget(),getLaunch());
 		}
 		if (IReverseStepOverHandler.class.equals(adapterType)) {
 			return (T) new GdbReverseStepOverCommand(session, getSteppingModeTarget());
@@ -262,10 +262,10 @@ public class GdbSessionAdapters {
 			return (T) new GdbUncallCommand(session, getSteppingModeTarget());
 		}
 		if (ISuspendHandler.class.equals(adapterType)) {
-			return (T) new DsfSuspendCommand(session);
+			return (T) new DsfSuspendCommand(session,getLaunch());
 		}
 		if (IResumeHandler.class.equals(adapterType)) {
-			return (T) new DsfResumeCommand(session);
+			return (T) new DsfResumeCommand(session,getLaunch());
 		}
 		if (IReverseResumeHandler.class.equals(adapterType)) {
 			return (T) new GdbReverseResumeCommand(session);

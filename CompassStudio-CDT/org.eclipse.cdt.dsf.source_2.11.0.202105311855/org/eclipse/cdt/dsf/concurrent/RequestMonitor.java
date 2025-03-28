@@ -390,10 +390,8 @@ public class RequestMonitor extends DsfExecutable {
 	@ConfinedToDsfExecutor("fExecutor")
 	protected void handleCompleted() {
 		if (isSuccess()) {
-//			System.out.println("success");
 			handleSuccess();
 		} else {
-//			System.out.println("false");
 			handleFailure();
 		}
 	}

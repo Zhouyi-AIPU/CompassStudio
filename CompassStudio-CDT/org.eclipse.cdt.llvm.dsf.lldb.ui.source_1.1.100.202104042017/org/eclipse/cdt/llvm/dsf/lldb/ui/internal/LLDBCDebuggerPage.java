@@ -88,6 +88,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	public Composite cfgComposite;
 	public Composite simulatorCom;
 	public Composite hardwareCom;
+	public Composite coreDumpCom;
 	// connectionTab
 	public Button btn1;
 	public Button btn2;
@@ -104,6 +105,8 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	public Label addrressLabel;
 	public Label runcfgLabel;
 	public IProject pro;
+	public String irPath;
+	public String weightPath; 
 
 	@Override
 	public void createControl(Composite parent) {
@@ -180,6 +183,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 
 		simulatorCom = createSimulatorCfgCompoiste(cfgComposite);
 		hardwareCom = createHardwareCfgComposite(cfgComposite);
+		coreDumpCom = createCoreDumpCfgComposite(cfgComposite);
 		stackLayout.topControl = simulatorCom;
 
 		comboPlatform.addSelectionListener(widgetSelectedAdapter(e -> selectLayout()));
@@ -197,6 +201,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 			stackLayout.topControl = hardwareCom;
 			cfgComposite.layout();
 		}
+		updateLaunchConfigurationDialog();
 	}
 
 	public void createSingleTecControl(Composite composite) {
@@ -303,7 +308,11 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 
 		inputText.addListener(SWT.Modify, new ChangeListener());
 	}
-
+	
+	//CUSTOMIZATION FOR COREDUMP
+	public Composite createCoreDumpCfgComposite(Composite composite) {
+		return composite;
+	}
 	// aipugb
 	protected Composite createHardwareCfgComposite(Composite composite) {
 		Composite com = new Composite(composite, SWT.None);
@@ -491,6 +500,15 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	}// CUSTOMIZATION
 
 	public void initialCustomizationFrom(ILaunchConfiguration configuration) throws CoreException {
+		runirText.setText(
+				configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_IR_PATH, irPath));
+		runweightText.setText(configuration
+				.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_WEIGHT_PATH, weightPath));
+		
+		gbirText.setText(
+				configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_IR_PATH, irPath));
+		gbweightText.setText(configuration
+				.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_WEIGHT_PATH, weightPath));
 		// inputs
 		java.util.List<String> inputpath = AIPULaunchPathUtils.getInputBinPath(pro);
 		String hardware_debug_cfg = AIPULaunchPathUtils.getDebugRun_cfg_FilePath(pro, 1);
@@ -521,15 +539,13 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 				return;
 			pro = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			if (pro.exists()) {
-				String irPath = "";
-				String weightPath = "";
 				String irFolder = AIPULaunchPathUtils.getIRFolderPath(pro); // fix : if ir folder is null, ir and weight path is "";
 				if (!irFolder.equals("")) {
 					File file = new File(irFolder);
 					File[] filelists = file.listFiles();
 					for (int i = 0; i < filelists.length; i++) {
 						File tmp = filelists[i];
-						if (tmp.getName().endsWith(".txt")) {
+						if (tmp.getName().endsWith(".txt")||tmp.getName().endsWith(".def")) {
 							irPath = tmp.getAbsolutePath();
 						} else if (tmp.getName().endsWith(".bin")) {
 							weightPath = tmp.getAbsolutePath();
@@ -540,24 +556,15 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 				initialCustomizationFrom(configuration);
 
 				comboPlatform.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE, 0));
-				runirText.setText(
-						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_IR_PATH, irPath));
-				runweightText.setText(configuration
-						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_WEIGHT_PATH, weightPath));
 
 				runTarget
 						.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_TARGET, 0));
 				runOtherCommand.setText(
 						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_SIMULATOR_OTHERCOMMAND, ""));
-
+				
 				hardwareRunTarget
 						.select(configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TARGET, 0));
-
 				// hardrware
-				gbirText.setText(
-						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_IR_PATH, irPath));
-				gbweightText.setText(configuration
-						.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_WEIGHT_PATH, weightPath));
 				gbOtherCommand.setText(
 						configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_OTHER_COMMAND, ""));
 
@@ -566,8 +573,13 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 
 				java.util.List<String> hardwareTranslatefiles = addTranslateFile(pro);
 				java.util.List<String> allFiles = new ArrayList<String>();
-				allFiles = configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES,
-						hardwareTranslatefiles);
+				if (configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES,
+						hardwareTranslatefiles).size()==0) {
+					allFiles=hardwareTranslatefiles;
+				}else{
+					allFiles = configuration.getAttribute(NPUDBLaunchConfigurationConstants.ATTR_HARDWARE_TRANSLATE_FILES,
+							hardwareTranslatefiles);
+				}
 				fileListCom.removeAll();
 				for (String s : allFiles) {
 					fileListCom.add(s);
@@ -585,18 +597,25 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 					setConnectionTabControlsStatus(false);
 				}
 
-				if (comboPlatform.getSelectionIndex() == 0) {
-					stackLayout.topControl = simulatorCom;
-					cfgComposite.layout();
-				} else {
-					stackLayout.topControl = hardwareCom;
-					cfgComposite.layout();
-				}
+				initializeDebugTypeFrom();
 
 			}
 
 		} catch (CoreException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void initializeDebugTypeFrom() {
+		if (comboPlatform.getSelectionIndex() == 0) {
+			stackLayout.topControl = simulatorCom;
+			cfgComposite.layout();
+		} else {
+			stackLayout.topControl = hardwareCom;
+			cfgComposite.layout();
 		}
 	}
 
@@ -667,9 +686,6 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 			addBtn.setEnabled(false);
 			deleteBtn.setEnabled(false);
 			copyBtn.setEnabled(false);
-			// runcfgnonetLabel.setEnabled(false);
-			// runnonetcfgText.setEnabled(false);
-			// cfgnonetBtn.setEnabled(false);
 			addrrsText.setEnabled(true);
 			runcfgText.setEnabled(true);
 			cfgBtn.setEnabled(true);
@@ -680,9 +696,6 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 			addBtn.setEnabled(true);
 			deleteBtn.setEnabled(true);
 			copyBtn.setEnabled(true);
-			// runcfgnonetLabel.setEnabled(true);
-			// runnonetcfgText.setEnabled(true);
-			// cfgnonetBtn.setEnabled(true);
 			addrrsText.setEnabled(false);
 			runcfgText.setEnabled(false);
 			cfgBtn.setEnabled(false);
@@ -706,7 +719,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 	}
 	
 	class BtnSelectionListener extends SelectionAdapter {
-		private Text text;
+		public Text text;
 
 		BtnSelectionListener(Text text) {
 			this.text = text;
@@ -720,6 +733,7 @@ public class LLDBCDebuggerPage extends AbstractCDebuggerPage {
 			if (fn != null) {
 				text.setText(fn);
 			}
+			updateLaunchConfigurationDialog();
 		}
 	}
 

@@ -166,7 +166,7 @@ public interface IRunControl extends IDsfService {
 	void suspend(IExecutionDMContext context, RequestMonitor requestMonitor);
 
 	public enum StepType {
-		STEP_OVER, STEP_INTO, STEP_RETURN, INSTRUCTION_STEP_OVER, INSTRUCTION_STEP_INTO,
+		STEP_OVER, STEP_INTO, LAYER_STEP,STEP_RETURN, INSTRUCTION_STEP_OVER, INSTRUCTION_STEP_INTO,
 		/**
 		 * @since 2.0
 		 */

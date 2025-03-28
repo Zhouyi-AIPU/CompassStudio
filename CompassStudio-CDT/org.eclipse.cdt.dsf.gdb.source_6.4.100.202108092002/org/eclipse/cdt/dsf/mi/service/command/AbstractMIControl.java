@@ -780,7 +780,6 @@ public abstract class AbstractMIControl extends AbstractDsfService implements IM
 //						}
 						writeToTracingStream(true, str);
 						fOutputStream.write(str.getBytes());
-//						System.out.println("send to debugger command: " + str);
 						fOutputStream.flush();
 					}
 				} catch (IOException e) {
@@ -843,7 +842,6 @@ public abstract class AbstractMIControl extends AbstractDsfService implements IM
 							}
 						}
 						writeToTracingStream(false, line);
-//						System.out.println("write to trace stream: " + line.toString());
 						processMIOutput(line);
 					}
 				}
@@ -977,6 +975,15 @@ public abstract class AbstractMIControl extends AbstractDsfService implements IM
 		}
 
 		void processMIOutput(String line) {
+			//CUSTOMIZATION FOR COREDUMP
+//			if (line.contains("stopped,reason")) {
+//				line="*stopped,reason=\"breakpoint-hit\",disp=\"del\",bkptno=\"1\",frame={level=\"0\",addr=\"0x0000000000001520\",func=\"Transpose8Bit\",args=[{name=\"in_0\",value=\"1408\"},{name=\"in_1\",value=\"128\"},{name=\"in_2\",value=\"4\"},{name=\"in_3\",value=\"0\"},{name=\"in_4\",value=\"1\"},{name=\"in_5\",value=\"1\"},{name=\"p0\",value=\"0\"},{name=\"p1\",value=\"2\"},{name=\"p2\",value=\"1\"},{name=\"p3\",value=\"1\"},{name=\"p4\",value=\"1\"},{name=\"p5\",value=\"1\"},{name=\"dim\",value=\"3\"},{name=\"in_addr\",value=\"0x00264000 \\\"?+\\\\\\\\f\\\\\\\\U00000001??????\\\\n"
+//						+ "\\\\\\U00000015???D\\\\\\\\n?\\\\\\\\U0000001a\\\\\\\\U00000005\\\\\\\\U00000003?4\\\\\\\\U00000018??#\\\\\\\\a&\\\\\\\\U00000018??\\n"
+//						+ "??\\\\\\\\U00000014?\\\\\\\\v??\\\\\\\\f?\\\\\\\\U0000001a-???$?&\\\\\\\\U0000001a?\\\\\\\\U00000016?\\\\\\\\U00000017\\\\\\\\U00000\\n"
+//						+ "005??\\\\\\\\U0000000f???\\\\\\\\U00000013\\\\\\\\f\\\\\\\\a?\\\\\\\\U00000019?????*?\\\"\"},{name=\"out_addr\",value=\"0x0006\\n"
+//						+ "4000 \\\"\\\"\"},{name=\"workspace\",value=\"0x00064000 \\\"\\\"\"}],file=\"d2s.cl\",fullname=\"/project/ai/scratch0\\n"
+//						+ "1/alanchen01/Eclipse_Project/runtime-OpenCL/d2s/src/d2s.cl\",line=\"922\"},thread-id=\"1\",stopped-threads=\"all\",tec-info={isCur=\"true\",Kernel-instanceId=\"0\",Work-groupId=\"(1,0,0)\",Work-itemId=\"(0,0,0)\",TecId=\"(0,0,0)\",state=\"Stopped\"},layer-id=\"5\"";
+//			}
 
 			MIParser.RecordType recordType = fMiParser.getRecordType(line);
 
@@ -1038,7 +1045,6 @@ public abstract class AbstractMIControl extends AbstractDsfService implements IM
 								 *  Now tell the generic listeners about it.
 								 */
 								processCommandDone(commandHandle, finalResult);
-//								System.out.println("command result: " + finalResult.toString());
 							}
 
 							@Override

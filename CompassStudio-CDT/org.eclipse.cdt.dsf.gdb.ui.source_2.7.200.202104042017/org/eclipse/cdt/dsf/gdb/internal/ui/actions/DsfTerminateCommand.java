@@ -67,7 +67,7 @@ public class DsfTerminateCommand implements ITerminateHandler {
 			request.done();
 			return;
 		}
-
+		
 		final GdbLaunch launch = getLaunch(request);
 		if (launch != null) {
 			fExecutor.execute(new DsfRunnable() {
@@ -161,6 +161,7 @@ public class DsfTerminateCommand implements ITerminateHandler {
 				}
 			});
 		}
+		
 		return false;
 	}
 

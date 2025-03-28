@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.python.pydev.debug.source
+Bundle-Version: 9.0.0.202108151241
+Eclipse-SourceBundle: org.python.pydev.debug;version="9.0.0.202108151241
+ ";roots:="pydev-debugsrc"
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+
+

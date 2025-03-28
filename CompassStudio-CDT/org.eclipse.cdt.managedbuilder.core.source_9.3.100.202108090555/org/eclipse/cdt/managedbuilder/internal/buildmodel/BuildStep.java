@@ -45,6 +45,8 @@ import org.eclipse.cdt.managedbuilder.macros.IBuildMacroProvider;
 import org.eclipse.cdt.managedbuilder.macros.IFileContextData;
 import org.eclipse.cdt.utils.cdtvariables.CdtVariableResolver;
 import org.eclipse.cdt.utils.cdtvariables.SupplierBasedCdtVariableSubstitutor;
+import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
@@ -267,25 +269,37 @@ public class BuildStep implements IBuildStep {
 					List<String> args = new ArrayList<>();
 					args.addAll(cleanCmdArgs.subList(1, cleanCmdArgs.size()));
 					int totalLen = initialLen;
-					for (IBuildResource resource : resources) {
-						IPath resLoc = BuildDescriptionManager.getRelPath(cwd, resource.getLocation());
-						String path = resLoc.toString();
-						int pathLen = path.length() + PER_ARGUMENT_PADDING;
+					//CUSTOMIZATION FOR OPENCL : opencl toolchain only has compiler,the output is not the project name
+					// don't add the project name. eg. rm -rf src
+					IProjectNature proNature = null;
+					try {
+						proNature = fBuildDescription.getProject().getNature("cn.com.armchina.ide.openclnature");
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(proNature ==null)
+					{
+						for (IBuildResource resource : resources) {
+							IPath resLoc = BuildDescriptionManager.getRelPath(cwd, resource.getLocation());
+							String path = resLoc.toString();
+							int pathLen = path.length() + PER_ARGUMENT_PADDING;
 
-						if (totalLen + pathLen > MAX_CLEAN_LENGTH && totalLen != initialLen) {
-							// adding new path takes us over limit, emit what we have...
-							BuildCommand buildCommand = new BuildCommand(cleanCmdPath,
-									args.toArray(new String[args.size()]), env, cwd, this);
-							list.add(buildCommand);
+							if (totalLen + pathLen > MAX_CLEAN_LENGTH && totalLen != initialLen) {
+								// adding new path takes us over limit, emit what we have...
+								BuildCommand buildCommand = new BuildCommand(cleanCmdPath,
+										args.toArray(new String[args.size()]), env, cwd, this);
+								list.add(buildCommand);
 
-							// ...and restart
-							totalLen = initialLen;
-							args.clear();
-							args.addAll(cleanCmdArgs.subList(1, cleanCmdArgs.size()));
+								// ...and restart
+								totalLen = initialLen;
+								args.clear();
+								args.addAll(cleanCmdArgs.subList(1, cleanCmdArgs.size()));
+							}
+
+							args.add(path);
+							totalLen += pathLen;
 						}
-
-						args.add(path);
-						totalLen += pathLen;
 					}
 
 					// add remaining files

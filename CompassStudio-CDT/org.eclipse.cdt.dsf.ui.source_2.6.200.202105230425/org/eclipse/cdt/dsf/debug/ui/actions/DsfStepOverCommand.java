@@ -13,6 +13,9 @@
  *******************************************************************************/
 package org.eclipse.cdt.dsf.debug.ui.actions;
 
+import java.util.Map;
+
+import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.dsf.concurrent.DataRequestMonitor;
 import org.eclipse.cdt.dsf.concurrent.DsfExecutor;
 import org.eclipse.cdt.dsf.concurrent.ImmediateExecutor;
@@ -22,9 +25,13 @@ import org.eclipse.cdt.dsf.debug.ui.viewmodel.SteppingController;
 import org.eclipse.cdt.dsf.internal.ui.DsfUIPlugin;
 import org.eclipse.cdt.dsf.service.DsfServicesTracker;
 import org.eclipse.cdt.dsf.service.DsfSession;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.commands.IDebugCommandRequest;
 import org.eclipse.debug.core.commands.IEnabledStateRequest;
 import org.eclipse.debug.core.commands.IStepOverHandler;
+
+import cn.com.armchina.toolchain.core.NPUDBLaunchConfigurationConstants;
 
 /**
  *
@@ -36,11 +43,13 @@ public class DsfStepOverCommand implements IStepOverHandler {
 	private final DsfExecutor fExecutor;
 	private final DsfServicesTracker fTracker;
 	private final DsfSteppingModeTarget fSteppingMode;
+	private final ILaunch fLaunch;
 
-	public DsfStepOverCommand(DsfSession session, DsfSteppingModeTarget steppingMode) {
+	public DsfStepOverCommand(DsfSession session, DsfSteppingModeTarget steppingMode,ILaunch launch) {
 		fExecutor = session.getExecutor();
 		fTracker = new DsfServicesTracker(DsfUIPlugin.getBundleContext(), session.getId());
 		fSteppingMode = steppingMode;
+		fLaunch=launch;
 	}
 
 	public void dispose() {
@@ -49,6 +58,19 @@ public class DsfStepOverCommand implements IStepOverHandler {
 
 	@Override
 	public void canExecute(final IEnabledStateRequest request) {
+		Map<String, Object> attributes;//CUSTOMIZATION FOR COREDUMP
+		try {
+			attributes = fLaunch.getLaunchConfiguration().getAttributes();
+			int debugmode = attributes.get(NPUDBLaunchConfigurationConstants.ATTR_LAYER_DEBUG_MODE) == null ? 0:(int) attributes.get(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE);
+			if (debugmode == 2) {
+				request.setEnabled(false);
+				request.done();
+				return;
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		
 		if (request.getElements().length != 1) {
 			request.setEnabled(false);
 			request.done();

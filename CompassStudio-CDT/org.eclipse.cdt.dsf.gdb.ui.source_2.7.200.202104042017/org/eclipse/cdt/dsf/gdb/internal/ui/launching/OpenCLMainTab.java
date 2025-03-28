@@ -2,6 +2,7 @@ package org.eclipse.cdt.dsf.gdb.internal.ui.launching;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.IBinary;
@@ -11,7 +12,10 @@ import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.cdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.cdt.ui.CElementLabelProvider;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
@@ -40,6 +44,11 @@ import org.eclipse.ui.dialogs.TwoPaneElementSelector;
  * @author Alan Chen
  */
 public class OpenCLMainTab extends CMainTab {
+
+	public static final String DSL_NATURE_ID = "cn.com.armchina.tvm.dsl.ui.dslnature";
+	public static final String CMAKE_NATURE_ID = "org.eclipse.cdt.make.core.makeNature";
+	public static final String OPENCL_NATURE_ID = "cn.com.armchina.ide.openclnature";
+
 	@Override
 	protected void initializeCustomizationProgramName(ICElement cElement, ILaunchConfigurationWorkingCopy config) {
 		boolean renamed = false;
@@ -224,19 +233,64 @@ public class OpenCLMainTab extends CMainTab {
 			if (cproject == null || !cproject.exists()) {
 				return null;
 			}
-			final String[][] ret = new String[1][];
-			String elementName = cproject.getElementName();
-			String sourcePath = cproject.getLocationURI() + File.separator + "Debug" + File.separator + "src"
-					+ File.separator
-					+ elementName + ".o";
-			sourcePath = sourcePath.replace("file:", "");
-			File sourceFile = new File(sourcePath);
-			if (sourceFile.exists()) {
-				ArrayList<String> list = new ArrayList<String>();
-				list.add("Debug" + File.separator + "src" + File.separator + elementName + ".o");
-				String[] b = new String[list.size()];
-				ret[0] = list.toArray(b);
+			IProject project = cproject.getProject();
+			IProjectDescription description;
+			try {
+				description = project.getDescription();
+				String[] prevNatures = description.getNatureIds();
+				if (prevNatures[0].equals(CMAKE_NATURE_ID) || prevNatures[0].equals(DSL_NATURE_ID)) {
+					IFolder dslscript = project.getFolder("DSLScript");
+					String path = dslscript.getLocationURI().getPath().toString();
+					File dir = new File(path);
+					List<String> binFiles = new ArrayList<String>();
+					searchDSLBinFiles(dir, binFiles);
+					return binFiles.toArray(new String[0]);
+				} else if (prevNatures[0].equals(OPENCL_NATURE_ID)) {
+					//list all xxx.o files so that to support multi op debug on one project
+					final String[][] ret = new String[1][];			
+					String sourcePath = cproject.getLocationURI().getPath()+File.separator +"Debug"+File.separator +"src";
+					File sourceFile = new File(sourcePath);
+					if (sourceFile.exists()) {
+						ArrayList<String> list = new ArrayList<String>();
+						File[] filelists = sourceFile.listFiles();
+						for(int i= 0; i<filelists.length;i++)
+						{
+							if(filelists[i].getName().endsWith(".o"))
+							{
+								list.add("Debug" + File.separator + "src" + File.separator + filelists[i].getName() );
+							}								
+						}
+						
+						String[] b = new String[list.size()];
+						ret[0] = list.toArray(b);
+					}
+					return ret[0];
+				}
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			return ret[0];
+			return new String[0];
 		}
+
+		private String[] searchDSLBinFiles(File folder, List<String> binFiles)
+	  {
+
+		File[] files = folder.listFiles();
+		if(files.length >0)
+		{
+			for(File file :files)
+			{
+				if(file.isDirectory())
+				{
+					searchDSLBinFiles(file, binFiles);
+				} else if (file.getName().endsWith(".o"))
+				{
+					binFiles.add(file.getAbsolutePath());
+				}
+			}
+				
+		}
+		return binFiles.toArray(new String[0]);
+	}
 }

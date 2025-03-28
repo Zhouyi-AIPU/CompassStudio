@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.cdt.dsf.debug.ui.actions;
 
+import java.util.Map;
+
 import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.dsf.concurrent.DsfExecutor;
 import org.eclipse.cdt.dsf.concurrent.ImmediateDataRequestMonitor;
@@ -24,9 +26,13 @@ import org.eclipse.cdt.dsf.debug.service.IMultiRunControl;
 import org.eclipse.cdt.dsf.internal.ui.DsfUIPlugin;
 import org.eclipse.cdt.dsf.service.DsfServicesTracker;
 import org.eclipse.cdt.dsf.service.DsfSession;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.commands.IDebugCommandRequest;
 import org.eclipse.debug.core.commands.IEnabledStateRequest;
 import org.eclipse.debug.core.commands.ISuspendHandler;
+
+import cn.com.armchina.toolchain.core.NPUDBLaunchConfigurationConstants;
 
 /**
  *
@@ -36,10 +42,12 @@ import org.eclipse.debug.core.commands.ISuspendHandler;
 public class DsfSuspendCommand implements ISuspendHandler {
 	private final DsfExecutor fExecutor;
 	private final DsfServicesTracker fTracker;
+	private final ILaunch fLaunch;
 
-	public DsfSuspendCommand(DsfSession session) {
+	public DsfSuspendCommand(DsfSession session,ILaunch launch) {
 		fExecutor = session.getExecutor();
 		fTracker = new DsfServicesTracker(DsfUIPlugin.getBundleContext(), session.getId());
+		fLaunch=launch;
 	}
 
 	public void dispose() {
@@ -48,6 +56,19 @@ public class DsfSuspendCommand implements ISuspendHandler {
 
 	@Override
 	public void canExecute(final IEnabledStateRequest request) {
+		Map<String, Object> attributes;//CUSTOMIZATION FOR COREDUMP
+		try {
+			attributes = fLaunch.getLaunchConfiguration().getAttributes();
+			int debugmode = attributes.get(NPUDBLaunchConfigurationConstants.ATTR_LAYER_DEBUG_MODE) == null ? 0:(int) attributes.get(NPUDBLaunchConfigurationConstants.ATTR_DEBUG__MODE);
+			if (debugmode == 2) {
+				request.setEnabled(false);
+				request.done();
+				return;
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		
 		if (request.getElements().length == 1) {
 			canExecuteSingle(request);
 			return;

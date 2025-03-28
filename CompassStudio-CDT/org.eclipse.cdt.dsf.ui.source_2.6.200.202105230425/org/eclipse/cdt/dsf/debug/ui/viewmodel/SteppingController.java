@@ -51,6 +51,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
+import cn.com.armchina.toolchain.core.internal.opencl.layerdebug.services.LayerDebugSocketControl;
+
 /**
  * This class builds on top of standard run control service to provide
  * functionality for step queuing and delaying. Step queuing essentially allows
@@ -472,6 +474,13 @@ public final class SteppingController {
 			@Override
 			protected void handleError() {
 				super.handleError();
+				LayerDebugSocketControl fsc = fServicesTracker.getService(LayerDebugSocketControl.class);
+				//CUSTOMIZATION FOR LAYER DEBUG 
+				//layer step error info send to QT
+				if (fsc!=null && getStatus().getMessage().contains("layer")) { 
+					fsc.queueTxCommand("error,"+getStatus().getException().getMessage());
+					return;
+				}
 				CDebugUtils.error(getStatus(), SteppingController.this);
 			}
 		});
